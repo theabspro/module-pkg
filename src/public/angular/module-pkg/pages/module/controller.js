@@ -67,10 +67,12 @@ app.component('moduleList', {
 
             columns: [
                 { data: 'action', class: 'action', name: 'action', searchable: false },
-                { data: 'code', name: 'modules.code' },
                 { data: 'name', name: 'modules.name' },
-                { data: 'mobile_no', name: 'modules.mobile_no' },
-                { data: 'email', name: 'modules.email' },
+                { data: 'group_name', name: 'mg.name' },
+                { data: 'start_date', searchable: false },
+                { data: 'end_date', searchable: false },
+                { data: 'duration', searchable: false },
+                { data: 'completed_percentage', searchable: false },
             ],
             "infoCallback": function(settings, start, end, max, total, pre) {
                 $('#table_info').html(total)

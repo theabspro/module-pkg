@@ -18,52 +18,43 @@ class ModuleController extends Controller {
 	}
 
 	public function getModuleList(Request $request) {
-		$module_list = Module::withTrashed()
+		$modules = Module::withTrashed()
+		// ->join('project_versions as pv', 'modules.project_version_id', 'pv.id')
+			->join('module_groups as mg', 'modules.group_id', 'mg.id')
 			->select(
 				'modules.id',
-				'modules.code',
+				// 'pv.name as project_version_name',
 				'modules.name',
-				DB::raw('IF(modules.mobile_no IS NULL,"--",modules.mobile_no) as mobile_no'),
-				DB::raw('IF(modules.email IS NULL,"--",modules.email) as email'),
+				'mg.name as group_name',
+				DB::raw('date_format(modules.start_date,"%d-%m-%Y") as start_date'),
+				DB::raw('date_format(modules.end_date,"%d-%m-%Y") as end_date'),
+				'modules.duration as duration',
+				'modules.completion_percentage',
+				// DB::raw('IF(modules.email IS NULL,"--",modules.email) as email'),
 				DB::raw('IF(modules.deleted_at IS NULL,"Active","Inactive") as status')
 			)
-			->where('modules.company_id', Auth::user()->company_id)
-			->where(function ($query) use ($request) {
-				if (!empty($request->module_code)) {
-					$query->where('modules.code', 'LIKE', '%' . $request->module_code . '%');
-				}
-			})
-			->where(function ($query) use ($request) {
-				if (!empty($request->module_name)) {
-					$query->where('modules.name', 'LIKE', '%' . $request->module_name . '%');
-				}
-			})
-			->where(function ($query) use ($request) {
-				if (!empty($request->mobile_no)) {
-					$query->where('modules.mobile_no', 'LIKE', '%' . $request->mobile_no . '%');
-				}
-			})
-			->where(function ($query) use ($request) {
-				if (!empty($request->email)) {
-					$query->where('modules.email', 'LIKE', '%' . $request->email . '%');
-				}
-			})
-			->orderby('modules.id', 'desc');
+		// ->where('modules.company_id', Auth::user()->company_id)
+		// ->where(function ($query) use ($request) {
+		// 	if (!empty($request->module_code)) {
+		// 		$query->where('modules.code', 'LIKE', '%' . $request->module_code . '%');
+		// 	}
+		// })
+			->orderBy('modules.id', 'desc');
 
-		return Datatables::of($module_list)
-			->addColumn('code', function ($module_list) {
-				$status = $module_list->status == 'Active' ? 'green' : 'red';
-				return '<span class="status-indicator ' . $status . '"></span>' . $module_list->code;
+		return Datatables::of($modules)
+			->addColumn('name', function ($module) {
+				$status = $module->status == 'Active' ? 'green' : 'red';
+				return '<span class="status-indicator ' . $status . '"></span>' . $module->name;
 			})
-			->addColumn('action', function ($module_list) {
+			->addColumn('action', function ($module) {
 				$edit_img = asset('public/theme/img/table/cndn/edit.svg');
 				$delete_img = asset('public/theme/img/table/cndn/delete.svg');
 				return '
-					<a href="#!/module-pkg/module/edit/' . $module_list->id . '">
+					<a href="#!/module-pkg/module/edit/' . $module->id . '">
 						<img src="' . $edit_img . '" alt="View" class="img-responsive">
 					</a>
 					<a href="javascript:;" data-toggle="modal" data-target="#delete_module"
-					onclick="angular.element(this).scope().deleteModule(' . $module_list->id . ')" dusk = "delete-btn" title="Delete">
+					onclick="angular.element(this).scope().deleteModule(' . $module->id . ')" dusk = "delete-btn" title="Delete">
 					<img src="' . $delete_img . '" alt="delete" class="img-responsive">
 					</a>
 					';
