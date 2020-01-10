@@ -12,40 +12,71 @@ class ModulePermissionSeeder extends Seeder {
 	 */
 	public function run() {
 		$permissions = [
-			//MASTER > CUSTOMERS
-			4600 => [
-				'display_order' => 10,
-				'parent_id' => null,
-				'name' => 'modules',
-				'display_name' => 'Modules',
+			//MODULE GROUP
+			[
+				'display_order' => 99,
+				'parent' => null,
+				'name' => 'module-groups',
+				'display_name' => 'Module Groups',
 			],
-			4601 => [
+			[
 				'display_order' => 1,
-				'parent_id' => 4600,
-				'name' => 'add-module',
+				'parent' => 'module-groups',
+				'name' => 'add-module-group',
 				'display_name' => 'Add',
 			],
-			4602 => [
-				'display_order' => 2,
-				'parent_id' => 4600,
-				'name' => 'edit-module',
+			[
+				'display_order' => 1,
+				'parent' => 'module-groups',
+				'name' => 'edit-module-group',
 				'display_name' => 'Edit',
 			],
-			4603 => [
-				'display_order' => 3,
-				'parent_id' => 4600,
-				'name' => 'delete-module',
+			[
+				'display_order' => 2,
+				'parent' => 'module-groups',
+				'name' => 'delete-module-group',
 				'display_name' => 'Delete',
 			],
 
-		];
+			//MODULE
+			[
+				'display_order' => 99,
+				'parent' => null,
+				'name' => 'modules',
+				'display_name' => 'Modules',
+			],
+			[
+				'display_order' => 1,
+				'parent' => 'modules',
+				'name' => 'add-module',
+				'display_name' => 'Add',
+			],
+			[
+				'display_order' => 1,
+				'parent' => 'modules',
+				'name' => 'edit-module',
+				'display_name' => 'Edit',
+			],
+			[
+				'display_order' => 2,
+				'parent' => 'modules',
+				'name' => 'delete-module',
+				'display_name' => 'Delete',
+			],
+			[
+				'display_order' => 4,
+				'parent' => 'modules',
+				'name' => 'view-all-module',
+				'display_name' => 'View All',
+			],
+			[
+				'display_order' => 6,
+				'parent' => 'modules',
+				'name' => 'view-own-module',
+				'display_name' => 'View Only Own',
+			],
 
-		foreach ($permissions as $permission_id => $permsion) {
-			$permission = Permission::firstOrNew([
-				'id' => $permission_id,
-			]);
-			$permission->fill($permsion);
-			$permission->save();
-		}
+		];
+		Permission::createFromArrays($permissions);
 	}
 }
