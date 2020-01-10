@@ -8,35 +8,17 @@ use App\Config;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Module extends Model {
+class ModuleGroup extends Model {
 	use SeederTrait;
 	use SoftDeletes;
-	protected $table = 'modules';
+	protected $table = 'module_groups';
 	public $timestamps = true;
 	protected $fillable = [
-		'project_version_id',
 		'name',
-		'group_id',
-		'priority',
-		'platform_id',
-		'start_date',
-		'end_date',
-		'duration',
-		'completed_percentage',
-		'status_id',
-		'assigned_to_id',
-		'screens',
-		'remarks',
-		'source_branch_id',
-		'tester_id',
 	];
 
-	public function setStartDateAttribute($date) {
-		return $this->attributes['start_date'] = empty($date) ? date('Y-m-d') : date('Y-m-d', strtotime($date));
-	}
-
-	public function dependedModules() {
-		return $this->belongsToMany('Abs\ModulePkg\Module', 'module_dependency_module', 'module_id', 'dependancy_module_id');
+	public function modules() {
+		return $this->hasMany('Abs\ModulePkg\Module', 'group_id');
 	}
 
 	public static function createFromObject($record_data) {

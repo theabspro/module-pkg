@@ -1,7 +1,6 @@
 app.config(['$routeProvider', function($routeProvider) {
 
     $routeProvider.
-    //CUSTOMER
     when('/module-pkg/module/list', {
         template: '<module-list></module-list>',
         title: 'Modules',
@@ -13,8 +12,23 @@ app.config(['$routeProvider', function($routeProvider) {
     when('/module-pkg/module/edit/:id', {
         template: '<module-form></module-form>',
         title: 'Edit Module',
-    });
+    }).
+
+    when('/project-pkg/project-version/gantt-chart-view', {
+        template: '<project-version-gantt-chart-view></project-version-view-gantt-chart-view>',
+        title: 'View Gantt Chart',
+    })
+
+    ;
 }]);
+
+// app.config(function($mdDateLocaleProvider) {
+//     $mdDateLocaleProvider.parseDate = function(dateString) {
+//         var m = moment(dateString, 'DD-MM-YYYY', true);
+//         return m.isValid() ? m.toDate() : new Date(NaN);
+//     };
+// });
+
 
 app.component('moduleList', {
     templateUrl: module_list_template_url,
@@ -68,6 +82,7 @@ app.component('moduleList', {
             columns: [
                 { data: 'action', class: 'action', name: 'action', searchable: false },
                 { data: 'name', name: 'modules.name' },
+                { data: 'assigned_to', name: 'at.name' },
                 { data: 'group_name', name: 'mg.name' },
                 { data: 'start_date', searchable: false },
                 { data: 'end_date', searchable: false },
@@ -77,6 +92,7 @@ app.component('moduleList', {
             "infoCallback": function(settings, start, end, max, total, pre) {
                 $('#table_info').html(total)
                 $('.foot_info').html('Showing ' + start + ' to ' + end + ' of ' + max + ' entries')
+                $('#search_module').focus();
             },
             rowCallback: function(row, data) {
                 $(row).addClass('highlight-row');
@@ -147,6 +163,7 @@ app.component('moduleList', {
 app.component('moduleForm', {
     templateUrl: module_form_template_url,
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope) {
+        $('.focus').focus();
         get_form_data_url = typeof($routeParams.id) == 'undefined' ? module_get_form_data_url : module_get_form_data_url + '/' + $routeParams.id;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
@@ -156,13 +173,10 @@ app.component('moduleForm', {
         ).then(function(response) {
             // console.log(response);
             self.module = response.data.module;
-            self.address = response.data.address;
-            self.country_list = response.data.country_list;
+            self.extras = response.data.extras;
             self.action = response.data.action;
             $rootScope.loading = false;
             if (self.action == 'Edit') {
-                $scope.onSelectedCountry(self.address.country_id);
-                $scope.onSelectedState(self.address.state_id);
                 if (self.module.deleted_at) {
                     self.switch_value = 'Inactive';
                 } else {
@@ -171,7 +185,6 @@ app.component('moduleForm', {
             } else {
                 self.switch_value = 'Active';
                 self.state_list = [{ 'id': '', 'name': 'Select State' }];
-                self.city_list = [{ 'id': '', 'name': 'Select City' }];
             }
         });
 
@@ -190,6 +203,12 @@ app.component('moduleForm', {
         $scope.btnNxt = function() {}
         $scope.prev = function() {}
 
+        $('.datePicker').bootstrapDP({
+            format: "dd-mm-yyyy",
+            autoclose: "true",
+            todayHighlight: true,
+        });
+
         //SELECT STATE BASED COUNTRY
         $scope.onSelectedCountry = function(id) {
             module_get_state_by_country = vendor_get_state_by_country;
@@ -201,88 +220,26 @@ app.component('moduleForm', {
             });
         }
 
-        //SELECT CITY BASED STATE
-        $scope.onSelectedState = function(id) {
-            module_get_city_by_state = vendor_get_city_by_state
-            $http.post(
-                module_get_city_by_state, { 'state_id': id }
-            ).then(function(response) {
-                // console.log(response);
-                self.city_list = response.data.city_list;
-            });
-        }
-
         var form_id = '#form';
         var v = jQuery(form_id).validate({
             ignore: '',
             rules: {
-                'code': {
-                    required: true,
-                    minlength: 3,
-                    maxlength: 255,
-                },
                 'name': {
                     required: true,
                     minlength: 3,
                     maxlength: 255,
                 },
-                'cust_group': {
+                'duration': {
                     maxlength: 100,
                 },
-                'gst_number': {
-                    required: true,
-                    maxlength: 100,
-                },
-                'dimension': {
-                    maxlength: 50,
-                },
-                'address': {
-                    required: true,
-                    minlength: 5,
-                    maxlength: 250,
-                },
-                'address_line1': {
-                    minlength: 3,
-                    maxlength: 255,
-                },
-                'address_line2': {
-                    minlength: 3,
-                    maxlength: 255,
-                },
-                // 'pincode': {
-                //     required: true,
-                //     minlength: 6,
-                //     maxlength: 6,
-                // },
             },
             messages: {
-                'code': {
-                    maxlength: 'Maximum of 255 charaters',
-                },
                 'name': {
                     maxlength: 'Maximum of 255 charaters',
                 },
-                'cust_group': {
+                'duration': {
                     maxlength: 'Maximum of 100 charaters',
                 },
-                'dimension': {
-                    maxlength: 'Maximum of 50 charaters',
-                },
-                'gst_number': {
-                    maxlength: 'Maximum of 25 charaters',
-                },
-                'email': {
-                    maxlength: 'Maximum of 100 charaters',
-                },
-                'address_line1': {
-                    maxlength: 'Maximum of 255 charaters',
-                },
-                'address_line2': {
-                    maxlength: 'Maximum of 255 charaters',
-                },
-                // 'pincode': {
-                //     maxlength: 'Maximum of 6 charaters',
-                // },
             },
             invalidHandler: function(event, validator) {
                 $noty = new Noty({
@@ -351,5 +308,90 @@ app.component('moduleForm', {
                     });
             }
         });
+    }
+});
+
+//------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------
+app.component('projectVersionGanttChartView', {
+    templateUrl: project_version_gantt_chart_view_template_url,
+    controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope) {
+        // get_form_data_url = typeof($routeParams.id) == 'undefined' ? module_get_form_data_url : module_get_form_data_url + '/' + $routeParams.id;
+        var self = this;
+        self.hasPermission = HelperService.hasPermission;
+        self.angular_routes = angular_routes;
+        $http.get(
+            laravel_routes['getGanttChartData']
+        ).then(function(response) {
+            self.gantt_chart_data = response.data.gantt_chart_data;
+            google.charts.load('current', { 'packages': ['gantt'] });
+            google.charts.setOnLoadCallback(self.drawChart);
+            $rootScope.loading = false;
+        });
+
+
+
+        function toMilliseconds(minutes) {
+            return minutes * 60 * 1000;
+        }
+
+        function hoursToMilliseconds(hours) {
+            return hours * 60 * 60 * 1000;
+        }
+
+        function daysToMilliseconds(days) {
+            return days * 24 * 60 * 60 * 1000;
+        }
+
+        self.drawChart = function() {
+            var otherData = new google.visualization.DataTable();
+            otherData.addColumn('string', 'Task ID');
+            otherData.addColumn('string', 'Task Name');
+            otherData.addColumn('string', 'Resource');
+            otherData.addColumn('date', 'Start');
+            otherData.addColumn('date', 'End');
+            otherData.addColumn('number', 'Duration');
+            otherData.addColumn('number', 'Percent Complete');
+            otherData.addColumn('string', 'Dependencies');
+
+            // [
+            //                 ['toTrain', 'Walk to train stop', 'walk', null, null, hoursToMilliseconds(8), 100, null],
+            //                 ['music', 'Listen to music', 'music', null, null, hoursToMilliseconds(24), 100, null],
+            //                 ['wait', 'Wait for train', 'wait', null, null, hoursToMilliseconds(10), 100, 'toTrain'],
+            //                 ['train', 'Train ride', 'train', null, null, hoursToMilliseconds(180), 75, 'wait'],
+            //                 ['toWork', 'Walk to work', 'walk', null, null, hoursToMilliseconds(10), 0, 'train'],
+            //                 ['work', 'Sit down at desk', null, null, null, hoursToMilliseconds(2), 0, 'toWork'],
+
+            //             ]
+
+            otherData.addRows(self.gantt_chart_data);
+
+            var options = {
+                height: 1000,
+                gantt: {
+                    // defaultStartDateMillis: new Date(2015, 3, 28),
+                    defaultStartDate: new Date(2015, 3, 28),
+                    // defaultStartDate: new Date(),
+
+                    trackHeight: 30,
+                    criticalPathEnabled: true,
+                    criticalPathStyle: {
+                        stroke: '#e64a19',
+                        strokeWidth: 5
+                    },
+                    //     innerGridHorizLine: {
+                    //         stroke: '#ffe0b2',
+                    //         strokeWidth: 2
+                    //     },
+                    //     innerGridTrack: { fill: '#fff3e0' },
+                    //     innerGridDarkTrack: { fill: '#ffcc80' }
+                    // 
+                },
+            };
+
+            var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
+
+            chart.draw(otherData, options);
+        }
     }
 });

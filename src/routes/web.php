@@ -11,4 +11,6 @@ Route::group(['namespace' => 'Abs\ModulePkg', 'middleware' => ['web', 'auth'], '
 	Route::post('/module-group/save', 'ModuleGroupController@saveModule')->name('saveModuleGroup');
 	Route::get('/module-group/delete/{id}', 'ModuleGroupController@deleteModule')->name('deleteModuleGroup');
 
+	Route::get('/getGanttChartData', 'ModuleController@getGanttChartData')->name('getGanttChartData');
+
 });

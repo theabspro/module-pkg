@@ -25,7 +25,12 @@
                     </div><!-- Search Filter -->
                 </div><!-- Page Header Content -->
                 <div class="page-header-content button-block">
-                    <a href="#!/module-pkg/module/add" class="btn btn-primary">Add New</a>
+                    <a href="#!/module-pkg/module/add" class="btn btn-primary" ng-shortcut="'meta+shift+n'" ng-shortcut-click>
+                        Add New
+                    </a>
+                    <a href="#!/project-pkg/project-version/gantt-chart-view" class="btn btn-primary" ng-shortcut="'meta+shift+g'" ng-shortcut-click>
+                        Gantt Chart View
+                    </a>
                 </div><!-- Page Header Content -->
             </div><!-- Page Header Content Right -->
         </div><!-- Page Header Inner -->
@@ -39,10 +44,11 @@
                             <tr>
                                 <th class="action">Action</th>
                                 <th>Module Name</th>
+                                <th>Duration</th>
+                                <th>Assigned To</th>
                                 <th>Module Group</th>
                                 <th>Start Date</th>
                                 <th>End Date</th>
-                                <th>Duration</th>
                                 <th>Completed Percentage</th>
                             </tr>
                         </thead>

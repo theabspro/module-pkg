@@ -2,9 +2,10 @@
 
 namespace Abs\ModulePkg;
 use Abs\ModulePkg\Module;
+use Abs\ModulePkg\ModuleGroup;
 use App\Address;
-use App\Country;
 use App\Http\Controllers\Controller;
+use App\User;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -20,16 +21,19 @@ class ModuleController extends Controller {
 	public function getModuleList(Request $request) {
 		$modules = Module::withTrashed()
 		// ->join('project_versions as pv', 'modules.project_version_id', 'pv.id')
-			->join('module_groups as mg', 'modules.group_id', 'mg.id')
+			->leftJoin('module_groups as mg', 'modules.group_id', 'mg.id')
+			->leftJoin('users as at', 'modules.assigned_to_id', 'at.id')
 			->select(
 				'modules.id',
+				'at.name as assigned_to',
+
 				// 'pv.name as project_version_name',
 				'modules.name',
 				'mg.name as group_name',
 				DB::raw('date_format(modules.start_date,"%d-%m-%Y") as start_date'),
 				DB::raw('date_format(modules.end_date,"%d-%m-%Y") as end_date'),
 				'modules.duration as duration',
-				'modules.completion_percentage',
+				'modules.completed_percentage',
 				// DB::raw('IF(modules.email IS NULL,"--",modules.email) as email'),
 				DB::raw('IF(modules.deleted_at IS NULL,"Active","Inactive") as status')
 			)
@@ -39,7 +43,9 @@ class ModuleController extends Controller {
 		// 		$query->where('modules.code', 'LIKE', '%' . $request->module_code . '%');
 		// 	}
 		// })
-			->orderBy('modules.id', 'desc');
+			->orderBy('at.id', 'asc')
+			->orderBy('modules.duration', 'asc')
+		;
 
 		return Datatables::of($modules)
 			->addColumn('name', function ($module) {
@@ -65,19 +71,28 @@ class ModuleController extends Controller {
 	public function getModuleFormData($id = NULL) {
 		if (!$id) {
 			$module = new Module;
-			$address = new Address;
+			$module->priority = 1;
+			$module->completed_percentage = 0;
 			$action = 'Add';
 		} else {
 			$module = Module::withTrashed()->find($id);
-			$address = Address::where('address_of_id', 24)->where('entity_id', $id)->first();
-			if (!$address) {
-				$address = new Address;
-			}
+			$module->depended_module_ids = $module->dependedModules()->pluck('id')->toArray();
 			$action = 'Edit';
 		}
-		$this->data['country_list'] = $country_list = Collect(Country::select('id', 'name')->get())->prepend(['id' => '', 'name' => 'Select Country']);
 		$this->data['module'] = $module;
-		$this->data['address'] = $address;
+		$this->data['extras']['module_list'] = Collect(
+			Module::select('id', 'name', 'code')
+				->where('id', '!=', $module->id)
+				->get())
+		;
+		$this->data['extras']['user_list'] = Collect(
+			User::select('id', 'name', 'email')
+				->get())
+		;
+		$this->data['extras']['group_list'] = Collect(
+			ModuleGroup::select('id', 'name')->orderBy('name')
+				->get())
+		;
 		$this->data['action'] = $action;
 
 		return response()->json($this->data);
@@ -87,40 +102,18 @@ class ModuleController extends Controller {
 		// dd($request->all());
 		try {
 			$error_messages = [
-				'code.required' => 'Module Code is Required',
-				'code.max' => 'Maximum 255 Characters',
-				'code.min' => 'Minimum 3 Characters',
-				'code.unique' => 'Module Code is already taken',
 				'name.required' => 'Module Name is Required',
 				'name.max' => 'Maximum 255 Characters',
 				'name.min' => 'Minimum 3 Characters',
-				'gst_number.required' => 'GST Number is Required',
-				'gst_number.max' => 'Maximum 191 Numbers',
-				'mobile_no.max' => 'Maximum 25 Numbers',
-				// 'email.required' => 'Email is Required',
-				'address_line1.required' => 'Address Line 1 is Required',
-				'address_line1.max' => 'Maximum 255 Characters',
-				'address_line1.min' => 'Minimum 3 Characters',
-				'address_line2.max' => 'Maximum 255 Characters',
-				// 'pincode.required' => 'Pincode is Required',
-				// 'pincode.max' => 'Maximum 6 Characters',
-				// 'pincode.min' => 'Minimum 6 Characters',
 			];
 			$validator = Validator::make($request->all(), [
-				'code' => [
+				'name' => [
 					'required:true',
 					'max:255',
 					'min:3',
-					'unique:modules,code,' . $request->id . ',id,company_id,' . Auth::user()->company_id,
+					'unique:modules,name,' . $request->id . ',id,project_version_id,' . Auth::user()->company_id,
 				],
-				'name' => 'required|max:255|min:3',
-				'gst_number' => 'required|max:191',
-				'mobile_no' => 'nullable|max:25',
-				// 'email' => 'nullable',
-				'address' => 'required',
-				'address_line1' => 'required|max:255|min:3',
-				'address_line2' => 'max:255',
-				// 'pincode' => 'required|max:6|min:6',
+				'duration' => 'required|numeric',
 			], $error_messages);
 			if ($validator->fails()) {
 				return response()->json(['success' => false, 'errors' => $validator->errors()->all()]);
@@ -132,15 +125,12 @@ class ModuleController extends Controller {
 				$module->created_by_id = Auth::user()->id;
 				$module->created_at = Carbon::now();
 				$module->updated_at = NULL;
-				$address = new Address;
 			} else {
 				$module = Module::withTrashed()->find($request->id);
 				$module->updated_by_id = Auth::user()->id;
 				$module->updated_at = Carbon::now();
-				$address = Address::where('address_of_id', 24)->where('entity_id', $request->id)->first();
 			}
 			$module->fill($request->all());
-			$module->company_id = Auth::user()->company_id;
 			if ($request->status == 'Inactive') {
 				$module->deleted_at = Carbon::now();
 				$module->deleted_by_id = Auth::user()->id;
@@ -148,26 +138,19 @@ class ModuleController extends Controller {
 				$module->deleted_by_id = NULL;
 				$module->deleted_at = NULL;
 			}
-			$module->gst_number = $request->gst_number;
-			$module->axapta_location_id = $request->axapta_location_id;
 			$module->save();
 
-			if (!$address) {
-				$address = new Address;
+			if (!$request->id) {
+				$module->code = 'MOD' . $module->id;
+				$module->save();
 			}
-			$address->fill($request->all());
-			$address->company_id = Auth::user()->company_id;
-			$address->address_of_id = 24;
-			$address->entity_id = $module->id;
-			$address->address_type_id = 40;
-			$address->name = 'Primary Address';
-			$address->save();
+			$module->dependedModules()->sync(json_decode($request->depended_module_ids));
 
 			DB::commit();
 			if (!($request->id)) {
-				return response()->json(['success' => true, 'message' => ['Module Details Added Successfully']]);
+				return response()->json(['success' => true, 'message' => ['Module Added Successfully']]);
 			} else {
-				return response()->json(['success' => true, 'message' => ['Module Details Updated Successfully']]);
+				return response()->json(['success' => true, 'message' => ['Module Updated Successfully']]);
 			}
 		} catch (Exceprion $e) {
 			DB::rollBack();
@@ -180,5 +163,39 @@ class ModuleController extends Controller {
 			$address_delete = Address::where('address_of_id', 24)->where('entity_id', $id)->forceDelete();
 			return response()->json(['success' => true]);
 		}
+	}
+
+	public function getGanttChartData() {
+		$modules = Module::
+			leftJoin('module_dependency_module as mdm', 'modules.id', 'mdm.dependancy_module_id')
+			->leftJoin('modules as dm', 'mdm.dependancy_module_id', 'dm.id')
+			->groupBy('modules.id')
+			->select([
+				'modules.*',
+				DB::raw('COUNT(dm.id) as depended_count'),
+			])
+			->orderBy('assigned_to_id')
+		// ->orderBy('depended_count')
+		// ->orderBy('duration')
+			->get();
+		$data = [];
+
+		foreach ($modules as $module) {
+			$data[] = [
+				$module->code,
+				$module->name,
+				$module->assigned_to_id . '',
+				// $module->start_date . '',
+				null,
+				null,
+				$module->duration * 24 * 60 * 60 * 1000,
+				(float) $module->completed_percentage,
+				implode(',', $module->dependedModules()->pluck('code')->toArray()),
+			];
+		}
+		return response()->json([
+			'success' => true,
+			'gantt_chart_data' => $data,
+		]);
 	}
 }
