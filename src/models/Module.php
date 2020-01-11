@@ -35,8 +35,16 @@ class Module extends Model {
 		return $this->attributes['start_date'] = empty($date) ? date('Y-m-d') : date('Y-m-d', strtotime($date));
 	}
 
+	public function parentModules() {
+		return $this->belongsToMany('Abs\ModulePkg\Module', 'module_dependency_module', 'module_id', 'dependancy_module_id');
+	}
+
 	public function dependedModules() {
 		return $this->belongsToMany('Abs\ModulePkg\Module', 'module_dependency_module', 'module_id', 'dependancy_module_id');
+	}
+
+	public function assignedTo() {
+		return $this->belongsTo('App\User', 'assigned_to_id');
 	}
 
 	public static function createFromObject($record_data) {
@@ -74,4 +82,22 @@ class Module extends Model {
 		return $record;
 	}
 
+	public function getGanttChartData(&$data) {
+		$data[$this->id] = [
+			$this->code,
+			$this->name . ' / ' . $this->assignedTo->name,
+			$this->assigned_to_id . '',
+			// 'new Date(' . date('Y,m,d', strtotime($module->start_date)) . ')',
+			null,
+			null,
+			$this->duration * 24 * 60 * 60 * 1000,
+			(float) $this->completed_percentage,
+			implode(',', $this->dependedModules()->pluck('code')->toArray()),
+			// $this->dependencies,
+		];
+		foreach ($this->dependedModules as $dm) {
+			$dm->getGanttChartData($data);
+		}
+
+	}
 }

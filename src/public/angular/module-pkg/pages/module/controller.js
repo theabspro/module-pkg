@@ -22,13 +22,6 @@ app.config(['$routeProvider', function($routeProvider) {
     ;
 }]);
 
-// app.config(function($mdDateLocaleProvider) {
-//     $mdDateLocaleProvider.parseDate = function(dateString) {
-//         var m = moment(dateString, 'DD-MM-YYYY', true);
-//         return m.isValid() ? m.toDate() : new Date(NaN);
-//     };
-// });
-
 
 app.component('moduleList', {
     templateUrl: module_list_template_url,
@@ -320,78 +313,94 @@ app.component('projectVersionGanttChartView', {
         var self = this;
         self.hasPermission = HelperService.hasPermission;
         self.angular_routes = angular_routes;
+
+        $rootScope.loading = true;
         $http.get(
-            laravel_routes['getGanttChartData']
+            laravel_routes['getGanttChartFormData']
         ).then(function(response) {
-            self.gantt_chart_data = response.data.gantt_chart_data;
-            google.charts.load('current', { 'packages': ['gantt'] });
-            google.charts.setOnLoadCallback(self.drawChart);
+            if (!response.data.success) {
+                showErrorNoty(response.data);
+                return;
+            }
+            self.extras = response.data.extras;
             $rootScope.loading = false;
         });
 
 
-
-        function toMilliseconds(minutes) {
-            return minutes * 60 * 1000;
-        }
-
-        function hoursToMilliseconds(hours) {
-            return hours * 60 * 60 * 1000;
-        }
-
-        function daysToMilliseconds(days) {
-            return days * 24 * 60 * 60 * 1000;
-        }
-
         self.drawChart = function() {
-            var otherData = new google.visualization.DataTable();
-            otherData.addColumn('string', 'Task ID');
-            otherData.addColumn('string', 'Task Name');
-            otherData.addColumn('string', 'Resource');
-            otherData.addColumn('date', 'Start');
-            otherData.addColumn('date', 'End');
-            otherData.addColumn('number', 'Duration');
-            otherData.addColumn('number', 'Percent Complete');
-            otherData.addColumn('string', 'Dependencies');
-
-            // [
-            //                 ['toTrain', 'Walk to train stop', 'walk', null, null, hoursToMilliseconds(8), 100, null],
-            //                 ['music', 'Listen to music', 'music', null, null, hoursToMilliseconds(24), 100, null],
-            //                 ['wait', 'Wait for train', 'wait', null, null, hoursToMilliseconds(10), 100, 'toTrain'],
-            //                 ['train', 'Train ride', 'train', null, null, hoursToMilliseconds(180), 75, 'wait'],
-            //                 ['toWork', 'Walk to work', 'walk', null, null, hoursToMilliseconds(10), 0, 'train'],
-            //                 ['work', 'Sit down at desk', null, null, null, hoursToMilliseconds(2), 0, 'toWork'],
-
-            //             ]
-
-            otherData.addRows(self.gantt_chart_data);
-
-            var options = {
-                height: 1000,
-                gantt: {
-                    // defaultStartDateMillis: new Date(2015, 3, 28),
-                    defaultStartDate: new Date(2015, 3, 28),
-                    // defaultStartDate: new Date(),
-
-                    trackHeight: 30,
-                    criticalPathEnabled: true,
-                    criticalPathStyle: {
-                        stroke: '#e64a19',
-                        strokeWidth: 5
+            $rootScope.loading = true;
+            $http.get(
+                laravel_routes['getGanttChartData'], {
+                    params: {
+                        'filtered_module_ids[]': self.filtered_module_ids
                     },
-                    //     innerGridHorizLine: {
-                    //         stroke: '#ffe0b2',
-                    //         strokeWidth: 2
-                    //     },
-                    //     innerGridTrack: { fill: '#fff3e0' },
-                    //     innerGridDarkTrack: { fill: '#ffcc80' }
-                    // 
-                },
-            };
+                }
+            ).then(function(response) {
+                if (!response.data.success) {
+                    showErrorNoty(response.data);
+                    return;
+                }
+                self.gantt_chart_data = response.data.gantt_chart_data;
 
-            var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
+                var otherData = new google.visualization.DataTable();
+                otherData.addColumn('string', 'Task ID');
+                otherData.addColumn('string', 'Task Name');
+                otherData.addColumn('string', 'Resource');
+                otherData.addColumn('date', 'Start');
+                otherData.addColumn('date', 'End');
+                otherData.addColumn('number', 'Duration');
+                otherData.addColumn('number', 'Percent Complete');
+                otherData.addColumn('string', 'Dependencies');
 
-            chart.draw(otherData, options);
+                var data = [];
+
+                console.log(self.gantt_chart_data)
+                for (var i in self.gantt_chart_data) {
+                    data.push(self.gantt_chart_data[i]);
+                }
+                otherData.addRows(data);
+                console.log(data.length)
+                var options = {
+                    height: (data.length * 50) + 200,
+                    gantt: {
+                        // defaultStartDateMillis: new Date(2015, 3, 28),
+                        defaultStartDate: new Date(2015, 3, 28),
+                        // defaultStartDate: new Date(),
+
+                        trackHeight: 50,
+                        criticalPathEnabled: true,
+                        criticalPathStyle: {
+                            stroke: '#e64a19',
+                            strokeWidth: 5
+                        },
+                        //     innerGridHorizLine: {
+                        //         stroke: '#ffe0b2',
+                        //         strokeWidth: 2
+                        //     },
+                        //     innerGridTrack: { fill: '#fff3e0' },
+                        //     innerGridDarkTrack: { fill: '#ffcc80' }
+                        // 
+                    },
+                };
+
+                var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
+
+                chart.draw(otherData, options);
+                $rootScope.loading = false;
+            });
         }
+
+        self.filtered_module_ids = [];
+        $scope.selectAllModules = function() {
+            self.filtered_module_ids = self.extras.all_module_ids;
+        };
+
+        $scope.deselectAllModules = function() {
+            self.filtered_module_ids = [];
+        };
+
+        google.charts.load('current', { 'packages': ['gantt'] });
+        google.charts.setOnLoadCallback(self.drawChart);
+
     }
 });

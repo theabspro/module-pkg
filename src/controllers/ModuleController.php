@@ -165,37 +165,75 @@ class ModuleController extends Controller {
 		}
 	}
 
-	public function getGanttChartData() {
+	public function getGanttChartFormData() {
 		$modules = Module::
 			leftJoin('module_dependency_module as mdm', 'modules.id', 'mdm.dependancy_module_id')
 			->leftJoin('modules as dm', 'mdm.dependancy_module_id', 'dm.id')
 			->groupBy('modules.id')
 			->select([
-				'modules.*',
+				'modules.id',
+				'modules.code',
+				'modules.name',
 				DB::raw('COUNT(dm.id) as depended_count'),
 			])
-			->orderBy('assigned_to_id')
-		// ->orderBy('depended_count')
-		// ->orderBy('duration')
+		// ->orderBy('modules.assigned_to_id')
+			->orderBy('depended_count')
+		// ->orderBy('modules.duration')
 			->get();
+
+		$extras = [
+			'module_list' => $modules,
+			'all_module_ids' => Module::pluck('id')->toArray(),
+
+		];
+
+		return response()->json([
+			'success' => true,
+			'extras' => $extras,
+		]);
+	}
+
+	public function getGanttChartData(Request $r) {
+		$modules = Module::from('modules')
+		// leftJoin('module_dependency_module as mdm', 'modules.id', 'mdm.module_id')
+		// ->leftJoin('modules as dm', 'mdm.dependancy_module_id', 'dm.id')
+		// ->select([
+		// 	'modules.*',
+		// 	DB::raw('COUNT(dm.id) as depended_count'),
+		// 	DB::raw('GROUP_CONCAT(dm.code) as dependencies'),
+		// ])
+		// ->groupBy('modules.id')
+		// ->orderBy('assigned_to_id')
+		;
+		if ($r->filtered_module_ids) {
+			$modules->where(function ($q) use ($r) {
+				$q->whereIn('modules.id', $r->filtered_module_ids);
+				// 	$q->orWhereRaw('modules.id IN (
+				// 		select
+				// 			mdm.dependancy_module_id
+				// 		from
+				// 			modules as sm
+				// 		left join
+				// 			module_dependency_module as mdm on mdm.module_id = sm.id
+				// 		where
+				// 			mdm.module_id = modules.id
+				// 			)
+				// 		'
+				// 	);
+				// 	// $q->orWhereIn('dm.id', $r->filtered_module_ids);
+			});
+		}
+		$modules = $modules->get();
 		$data = [];
 
 		foreach ($modules as $module) {
-			$data[] = [
-				$module->code,
-				$module->name,
-				$module->assigned_to_id . '',
-				// $module->start_date . '',
-				null,
-				null,
-				$module->duration * 24 * 60 * 60 * 1000,
-				(float) $module->completed_percentage,
-				implode(',', $module->dependedModules()->pluck('code')->toArray()),
-			];
+			$module->getGanttChartData($data);
 		}
+
 		return response()->json([
 			'success' => true,
 			'gantt_chart_data' => $data,
+			'filtered_module_ids' => $r->filtered_module_ids,
 		]);
 	}
 }
