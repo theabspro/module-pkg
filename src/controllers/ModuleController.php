@@ -76,17 +76,19 @@ class ModuleController extends Controller {
 			$action = 'Add';
 		} else {
 			$module = Module::withTrashed()->find($id);
-			$module->depended_module_ids = $module->dependedModules()->pluck('id')->toArray();
+			$module->depended_module_ids = $module->parentModules()->pluck('id')->toArray();
 			$action = 'Edit';
 		}
 		$this->data['module'] = $module;
 		$this->data['extras']['module_list'] = Collect(
 			Module::select('id', 'name', 'code')
 				->where('id', '!=', $module->id)
+				->orderBy('modules.code')
 				->get())
 		;
 		$this->data['extras']['user_list'] = Collect(
 			User::select('id', 'name', 'email')
+				->orderBy('users.name')
 				->get())
 		;
 		$this->data['extras']['group_list'] = Collect(
@@ -144,7 +146,7 @@ class ModuleController extends Controller {
 				$module->code = 'MOD' . $module->id;
 				$module->save();
 			}
-			$module->dependedModules()->sync(json_decode($request->depended_module_ids));
+			$module->parentModules()->sync(json_decode($request->depended_module_ids));
 
 			DB::commit();
 			if (!($request->id)) {
@@ -167,8 +169,8 @@ class ModuleController extends Controller {
 
 	public function getGanttChartFormData() {
 		$modules = Module::
-			leftJoin('module_dependency_module as mdm', 'modules.id', 'mdm.dependancy_module_id')
-			->leftJoin('modules as dm', 'mdm.dependancy_module_id', 'dm.id')
+			leftJoin('module_parent_module as mdm', 'modules.id', 'mdm.parent_module_id')
+			->leftJoin('modules as dm', 'mdm.parent_module_id', 'dm.id')
 			->groupBy('modules.id')
 			->select([
 				'modules.id',
@@ -196,7 +198,7 @@ class ModuleController extends Controller {
 	public function getGanttChartData(Request $r) {
 		$modules = Module::from('modules')
 		// leftJoin('module_dependency_module as mdm', 'modules.id', 'mdm.module_id')
-		// ->leftJoin('modules as dm', 'mdm.dependancy_module_id', 'dm.id')
+		// ->leftJoin('modules as dm', 'mdm.parent_module_id', 'dm.id')
 		// ->select([
 		// 	'modules.*',
 		// 	DB::raw('COUNT(dm.id) as depended_count'),
@@ -210,7 +212,7 @@ class ModuleController extends Controller {
 				$q->whereIn('modules.id', $r->filtered_module_ids);
 				// 	$q->orWhereRaw('modules.id IN (
 				// 		select
-				// 			mdm.dependancy_module_id
+				// 			mdm.parent_module_id
 				// 		from
 				// 			modules as sm
 				// 		left join
@@ -227,8 +229,17 @@ class ModuleController extends Controller {
 		$data = [];
 
 		foreach ($modules as $module) {
-			$module->getGanttChartData($data);
+			foreach ($module->subModules as $sub_module) {
+				$sub_module->getGanttChartData($data);
+			}
+			// foreach ($module->parentModules as $sub_module) {
+			// 	$module->getGanttChartData($data);
+			// }
 		}
+
+		// foreach ($modules as $module) {
+		// 	$module->getGanttChartData($data);
+		// }
 
 		return response()->json([
 			'success' => true,
