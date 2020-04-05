@@ -1,0 +1,253 @@
+<!-- Content Wrap -->
+<div class="content-wrap cndn-wrap">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-header-inner">
+            <div class="page-header-content-left">
+                <div class="page-header-content button-block">
+                    <a href="#!/module-pkg/module/list" type="button" class="btn-back btn-img" ng-shortcut="'meta+shift+left'" ng-shortcut-click>
+                        <img class="img-responsive" src="./public/theme/img/content/previous.svg" alt="Back" />
+                    </a>
+                </div><!-- Page Header Content -->
+                <div class="page-header-content title-block">
+                    <h1 class="title"><b>{{$ctrl.action}} Module</b></h1>
+                    <p class="subtitle">
+                        <a href="#!/module-pkg/module/list">
+                            Module List
+                        </a> /
+                        {{$ctrl.action}}
+                    </p>
+                </div><!-- Page Header Content -->
+            </div><!-- Page Header Content Left -->
+        </div><!-- Page Header Inner -->
+    </div><!-- Page Header -->
+    <!-- Page Main Content -->
+    <div class="page-main-content form-content type2">
+        <form id="form" autocomplete="off">
+            <input type="hidden" name="id" value="{{$ctrl.module.id}}">
+            <input type="hidden" name="project_version_id" value="1">
+            {{$ctrl.module.project_version_id}}
+            <div class="page-tab-form pb-70">
+                <div class="tab-form-wrap">
+                    <div class="tab-form-header">
+                        <div class="tab-header">
+                            <!-- Filters -->
+                            <div class="isotope-filters animated" data-animation="fadeInLeft" data-animation-delay="300">
+                                <ul class="nav nav-pills cndn-tabs">
+                                    <li class="active">
+                                        <a class="filter active" data-target="#general-information" data-toggle="tab" aria-expanded="true" ng-shortcut="'meta+1'" ng-shortcut-click>
+                                            General Information
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="filter active" data-target="#dependancy" data-toggle="tab" aria-expanded="true" ng-shortcut="'meta+2'" ng-shortcut-click>
+                                            Dependancy
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div><!-- Filters -->
+                        </div><!-- Tab Header -->
+                    </div><!-- Tab Form Header -->
+                    <div class="tab-form-body">
+                        <div class="tab-content">
+                            <!-- TAB PANEL -->
+                            <div class="tab-pane fade in active" id="general-information" data-animation="fadeInUp" data-animation-delay="300">
+                                <div class="tab-pane-wrap">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Module Name
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
+                                                <input type="text" class="form-control focus" ng-model="$ctrl.module.name" name="name" placeholder="Enter Module Name" ng-shortcut="'shift+f'" ng-shortcut-focus />
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Duration
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
+                                                <input type="text" class="form-control" ng-model="$ctrl.module.duration" name="duration" placeholder="Enter Duration" />
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Priority
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
+                                                <input type="text" class="form-control" ng-model="$ctrl.module.priority" name="priority" placeholder="Enter Priority" />
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Start Date
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
+                                                <div class="input-group date type-sm datePicker">
+                                                    <input name="start_date" ng-model="$ctrl.service_invoice.start_date" type="text" class="form-control" placeholder="Select Start Date" value="{{$ctrl.service_invoice.start_date}}" readonly />
+                                                    <div class="input-group-addon">
+                                                        <img class="img-responsive" src="public/theme/img/content/calender-gray-icon.svg" alt="Calendar Image" />
+                                                    </div>
+                                                </div><!-- Input Group -->
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Assigned To
+                                                </label>
+                                                <md-select ng-model="$ctrl.module.assigned_to_id" placeholder="Select Assignee" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header ng-hide">
+                                                        <input ng-model="searchAssignee" type="search" placeholder="Search Assignee" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                    </md-select-header>
+                                                    <md-optgroup label="Assigned To">
+                                                        <md-option ng-value="item.id" ng-repeat="item in $ctrl.extras.user_list | filter:searchTravel">
+                                                            {{item.name}} /
+                                                            {{item.email}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="assigned_to_id" value='{{$ctrl.module.assigned_to_id}}'>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Completed Percentage
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
+                                                <input type="text" class="form-control" ng-model="$ctrl.module.completed_percentage" name="completed_percentage" placeholder="Enter Completed Percentage" />
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Description
+                                                </label>
+                                                <textarea name="address" ng-model="$ctrl.module.address" class="form-control" rows="3" placeholder="Enter Address"></textarea>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Screens
+                                                </label>
+                                                <textarea name="address" ng-model="$ctrl.module.address" class="form-control" rows="3" placeholder="Enter Address"></textarea>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Group
+                                                </label>
+                                                <md-select ng-model="$ctrl.module.group_id" placeholder="Select Group" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header ng-hide">
+                                                        <input ng-model="searchModuleGroup" type="search" placeholder="Search Module Group" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                    </md-select-header>
+                                                    <md-optgroup label="Module Group List">
+                                                        <md-option ng-value="group.id" ng-repeat="group in $ctrl.extras.group_list | filter:searchTravel">
+                                                            {{group.name}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="group_id" value='{{$ctrl.module.group_id}}'>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    End Date
+                                                </label>
+                                                <div class="input-group date type-sm datePicker">
+                                                    <input name="end_date" ng-model="$ctrl.service_invoice.end_date" type="text" class="form-control" placeholder="Select Start Date" value="{{$ctrl.service_invoice.end_date}}" readonly />
+                                                    <div class="input-group-addon">
+                                                        <img class="img-responsive" src="public/theme/img/content/calender-gray-icon.svg" alt="Calendar Image" />
+                                                    </div>
+                                                </div><!-- Input Group -->
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Remarks
+                                                </label>
+                                                <textarea name="remarks" ng-model="$ctrl.module.remarks" class="form-control" rows="3" placeholder="Enter Remarks"></textarea>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Active Status
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
+                                                <div class="tab-switch">
+                                                    <md-switch ng-model="$ctrl.switch_value" aria-label="Active Status" ng-true-value="'Inactive'" ng-false-value="'Active'" class="md-warn">
+                                                        {{ $ctrl.switch_value }}
+                                                    </md-switch>
+                                                    <input type="hidden" name="status" value="{{$ctrl.switch_value}}">
+                                                </div>
+                                            </div><!-- Form Group -->
+                                        </div><!-- Column -->
+                                        <div class="tab-pane-footer">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <button type="submit" id="submit" class="btn btn-primary" ng-shortcut="'meta+s'" ng-shortcut-click>
+                                                        Submit
+                                                    </button>
+                                                    <a class="btn btn-primary btn-nxt" ng-shortcut="'meta+shift+down'" ng-shortcut-click>
+                                                        Next
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div><!-- Tab Footer -->
+                                    </div><!-- Row -->
+                                </div><!-- Tab Pane Wrap -->
+                            </div><!-- Tabe Pane -->
+                            <div class="tab-pane fade" id="dependancy" data-animation="fadeInUp" data-animation-delay="300">
+                                <div class="tab-pane-wrap">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>Depends On</label>
+                                                <md-select multiple ng-model="$ctrl.module.depended_module_ids" placeholder="Select Depended Modules" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header">
+                                                        <md-button layout-fill value="all" ng-if="$ctrl.depended_module_ids.length != $ctrl.extras.module_list.length" ng-click="selectAllFieldGroups()">SELECT ALL</md-button>
+                                                        <md-button layout-fill value="all" ng-if="$ctrl.depended_module_ids.length == $ctrl.extras.module_list.length" ng-click="deselectAllFieldGroups()">DESELECT ALL</md-button>
+                                                    </md-select-header>
+                                                    <md-optgroup label="Depended Modules">
+                                                        <md-option ng-value="item.id" ng-repeat="item in $ctrl.extras.module_list | filter:searchTravel">
+                                                            {{item.name}} / {{item.code}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="depended_module_ids" value='{{$ctrl.module.depended_module_ids}}'>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane-footer">
+                                            <div class="col-md-12">
+                                                <a class="btn btn-secondary btn-prev" ng-shortcut="'meta+shift+up'" ng-shortcut-click>
+                                                    Previous
+                                                </a>
+                                                <button type="submit" id="submit" class="btn btn-primary" ng-shortcut="'meta+shift+s'" ng-shortcut-click>
+                                                    Submit
+                                                </button>
+                                            </div>
+                                        </div><!-- Tab Footer -->
+                                    </div><!-- Row -->
+                                </div><!-- Tab Pane Wrap -->
+                            </div><!-- Tabe Pane -->
+                        </div><!-- Tab Content -->
+                    </div><!-- Tab Form Body -->
+                </div><!-- Tab Form Wrap -->
+            </div><!-- Page Form -->
+        </form>
+    </div><!-- Page Main Content -->
+</div><!-- Content Wrap -->
