@@ -57,6 +57,25 @@
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>
+                                                    Project Version
+                                                </label>
+                                                <md-select ng-model="$ctrl.module.project_version_id" placeholder="Select Project Version" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header ng-hide">
+                                                        <input ng-model="searchAssignee" type="search" placeholder="Search Assignee" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                    </md-select-header>
+                                                    <md-optgroup label="Assigned To">
+                                                        <md-option ng-value="item.id" ng-repeat="item in $ctrl.extras.project_version_list | filter:searchTravel">
+                                                            {{item.name}} /
+                                                            {{item.email}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="assigned_to_id" value='{{$ctrl.module.assigned_to_id}}'>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
                                                     Module Name
                                                     <sup class="mandatory">*</sup>
                                                 </label>

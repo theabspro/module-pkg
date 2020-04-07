@@ -25,8 +25,7 @@ class ModuleController extends Controller {
 			->leftJoin('users as at', 'modules.assigned_to_id', 'at.id')
 			->select(
 				'modules.id',
-				'at.name as assigned_to',
-
+				DB::raw('CONCAT(at.first_name," ",at.last_name) as assigned_to'),
 				// 'pv.name as project_version_name',
 				'modules.name',
 				'mg.name as group_name',
@@ -86,8 +85,20 @@ class ModuleController extends Controller {
 				->orderBy('modules.code')
 				->get())
 		;
+		$this->data['extras']['project_version_list'] = Collect(
+			ProjectVersion::select([
+				'id',
+				'name',
+			])
+			// ->orderBy('users.name')
+				->get())
+		;
 		$this->data['extras']['user_list'] = Collect(
-			User::select('id', 'name', 'email')
+			User::select([
+				'id',
+				DB::raw('CONCAT(first_name," ",last_name) as name'),
+				'email',
+			])
 				->orderBy('users.name')
 				->get())
 		;
