@@ -74,6 +74,8 @@ app.component('moduleList', {
 
             columns: [
                 { data: 'action', class: 'action', name: 'action', searchable: false },
+                { data: 'project_name', name: 'p.name' },
+                { data: 'project_version_number', name: 'pv.number' },
                 { data: 'name', name: 'modules.name' },
                 { data: 'assigned_to', name: 'at.name' },
                 { data: 'group_name', name: 'mg.name' },
@@ -184,6 +186,17 @@ app.component('moduleForm', {
                 self.state_list = [{ 'id': '', 'name': 'Select State' }];
             }
         });
+
+        $scope.projectChanged = function() {
+            $http.post(
+                laravel_routes['getProjectVersions'], {
+                    'project_id': self.module.project.id
+                }
+            ).then(function(response) {
+                self.extras.project_version_list = response.data.project_versions;
+            });
+
+        }
 
         /* Tab Funtion */
         $('.btn-nxt').on("click", function() {

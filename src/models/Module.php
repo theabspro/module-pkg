@@ -35,6 +35,18 @@ class Module extends Model {
 		return $this->attributes['start_date'] = empty($date) ? date('Y-m-d') : date('Y-m-d', strtotime($date));
 	}
 
+	public function setEndDateAttribute($date) {
+		return $this->attributes['end_date'] = empty($date) ? date('Y-m-d') : date('Y-m-d', strtotime($date));
+	}
+
+	public function getStartDateAttribute() {
+		return !empty($this->attributes['start_date']) ? date('d-m-Y', strtotime($this->attributes['start_date'])) : '';
+	}
+
+	public function getEndDateAttribute() {
+		return !empty($this->attributes['end_date']) ? date('d-m-Y', strtotime($this->attributes['end_date'])) : '';
+	}
+
 	public function parentModules() {
 		return $this->belongsToMany('Abs\ModulePkg\Module', 'module_parent_module', 'module_id', 'parent_module_id');
 	}
@@ -45,6 +57,10 @@ class Module extends Model {
 
 	public function assignedTo() {
 		return $this->belongsTo('App\User', 'assigned_to_id');
+	}
+
+	public function projectVersion() {
+		return $this->belongsTo('Abs\ProjectPkg\ProjectVersion');
 	}
 
 	public static function createFromObject($record_data, $company = null) {

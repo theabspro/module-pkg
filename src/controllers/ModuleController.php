@@ -5,6 +5,7 @@ use Abs\ModulePkg\Module;
 use Abs\ModulePkg\ModuleGroup;
 use Abs\ProjectPkg\Project;
 use Abs\ProjectPkg\ProjectVersion;
+use Abs\StatusPkg\Status;
 use App\Address;
 use App\Http\Controllers\Controller;
 use App\User;
@@ -22,33 +23,35 @@ class ModuleController extends Controller {
 
 	public function getModuleList(Request $request) {
 		$modules = Module::withTrashed()
-		// ->join('project_versions as pv', 'modules.project_version_id', 'pv.id')
+			->join('project_versions as pv', 'modules.project_version_id', 'pv.id')
+			->join('projects as p', 'pv.project_id', 'p.id')
 			->leftJoin('module_groups as mg', 'modules.group_id', 'mg.id')
 			->leftJoin('users as at', 'modules.assigned_to_id', 'at.id')
-			->select(
+			->select([
 				'modules.id',
+				DB::raw('CONCAT(p.short_name," / ",p.code) as project_name'),
+				'pv.number as project_version_number',
 				DB::raw('CONCAT(at.first_name," ",at.last_name) as assigned_to'),
-				// 'pv.name as project_version_name',
 				'modules.name',
 				'mg.name as group_name',
 				DB::raw('date_format(modules.start_date,"%d-%m-%Y") as start_date'),
 				DB::raw('date_format(modules.end_date,"%d-%m-%Y") as end_date'),
 				'modules.duration as duration',
 				'modules.completed_percentage',
-				// DB::raw('IF(modules.email IS NULL,"--",modules.email) as email'),
-				DB::raw('IF(modules.deleted_at IS NULL,"Active","Inactive") as status')
-			)
-		// ->where('modules.company_id', Auth::user()->company_id)
-		// ->where(function ($query) use ($request) {
-		// 	if (!empty($request->module_code)) {
-		// 		$query->where('modules.code', 'LIKE', '%' . $request->module_code . '%');
-		// 	}
-		// })
+				DB::raw('IF(modules.deleted_at IS NULL,"Active","Inactive") as status'),
+			])
+			->where('pv.company_id', Auth::user()->company_id)
+			->where(function ($query) use ($request) {
+				if (!empty($request->module_code)) {
+					$query->where('modules.code', 'LIKE', '%' . $request->module_code . '%');
+				}
+			})
 			->orderBy('at.id', 'asc')
 			->orderBy('modules.duration', 'asc')
 		;
 
 		return Datatables::of($modules)
+			->rawColumns(['name', 'action'])
 			->addColumn('name', function ($module) {
 				$status = $module->status == 'Active' ? 'green' : 'red';
 				return '<span class="status-indicator ' . $status . '"></span>' . $module->name;
@@ -58,7 +61,7 @@ class ModuleController extends Controller {
 				$delete_img = asset('public/theme/img/table/cndn/delete.svg');
 				return '
 					<a href="#!/module-pkg/module/edit/' . $module->id . '">
-						<img src="' . $edit_img . '" alt="View" class="img-responsive">
+						<img src="' . $edit_img . '" alt="edit" class="img-responsive">
 					</a>
 					<a href="javascript:;" data-toggle="modal" data-target="#delete_module"
 					onclick="angular.element(this).scope().deleteModule(' . $module->id . ')" dusk = "delete-btn" title="Delete">
@@ -69,7 +72,8 @@ class ModuleController extends Controller {
 			->make(true);
 	}
 
-	public function getModuleFormData($id = NULL) {
+	public function getModuleFormData(Request $r) {
+		$id = $r->id;
 		if (!$id) {
 			$module = new Module;
 			$module->priority = 1;
@@ -77,15 +81,22 @@ class ModuleController extends Controller {
 			$action = 'Add';
 			$this->data['extras']['project_version_list'] = [];
 		} else {
-			$module = Module::withTrashed()->find($id);
+			$module = Module::with([
+				'assignedTo',
+				'projectVersion',
+				'projectVersion.project',
+			])->withTrashed()->find($id);
+			$module->start_date = $module->start_date;
+			$module->end_date = $module->end_date;
+			$module->project = $module->projectVersion->project;
 			$module->depended_module_ids = $module->parentModules()->pluck('id')->toArray();
 			$action = 'Edit';
 			$this->data['extras']['project_version_list'] = Collect(
-			ProjectVersion::select([
-				'id',
-				'number',
-			])
-				->get());
+				ProjectVersion::select([
+					'id',
+					'number',
+				])
+					->get());
 		}
 		$this->data['module'] = $module;
 		$this->data['extras']['module_list'] = Collect(
@@ -94,20 +105,23 @@ class ModuleController extends Controller {
 				->orderBy('modules.code')
 				->get())
 		;
-		$this->data['extras']['projects'] = Collect(
+		$this->data['extras']['project_list'] = Collect(
 			Project::select([
 				'id',
 				'code',
+				'short_name',
 			])
 				->get())->prepend(['code' => 'Select Project'])
 		;
-		// $this->data['extras']['project_version_list'] = Collect(
-		// 	ProjectVersion::select([
-		// 		'id',
-		// 		'number',
-		// 	])
-		// 		->get())
-		// ;
+		$this->data['extras']['status_list'] = Collect(
+			Status::select([
+				'id',
+				'name',
+			])
+				->where('type_id', 161)
+				->company()
+				->get())->prepend(['name' => 'Select Status'])
+		;
 		$this->data['extras']['user_list'] = Collect(
 			User::select([
 				'id',
@@ -154,8 +168,7 @@ class ModuleController extends Controller {
 			if (!$request->id) {
 				$module = new Module;
 				$module->created_by_id = Auth::user()->id;
-				$module->created_at = Carbon::now();
-				$module->updated_at = NULL;
+				$module->code = 'temp';
 			} else {
 				$module = Module::withTrashed()->find($request->id);
 				$module->updated_by_id = Auth::user()->id;
