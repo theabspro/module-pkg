@@ -157,14 +157,18 @@ app.component('moduleForm', {
     templateUrl: module_form_template_url,
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope) {
         $('.focus').focus();
-        get_form_data_url = typeof($routeParams.id) == 'undefined' ? module_get_form_data_url : module_get_form_data_url + '/' + $routeParams.id;
+        // get_form_data_url = typeof($routeParams.id) == 'undefined' ? module_get_form_data_url : module_get_form_data_url + '/' + $routeParams.id;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
         self.angular_routes = angular_routes;
         $http.get(
-            get_form_data_url
+            laravel_routes['getModuleFormData'], {
+                params: {
+                    id: typeof($routeParams.id) == 'undefined' ? null : $routeParams.id,
+                }
+            }
         ).then(function(response) {
-            // console.log(response);
+            console.log(response.data);
             self.module = response.data.module;
             self.extras = response.data.extras;
             self.action = response.data.action;

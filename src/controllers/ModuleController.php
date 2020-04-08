@@ -3,6 +3,8 @@
 namespace Abs\ModulePkg;
 use Abs\ModulePkg\Module;
 use Abs\ModulePkg\ModuleGroup;
+use Abs\ProjectPkg\Project;
+use Abs\ProjectPkg\ProjectVersion;
 use App\Address;
 use App\Http\Controllers\Controller;
 use App\User;
@@ -73,10 +75,17 @@ class ModuleController extends Controller {
 			$module->priority = 1;
 			$module->completed_percentage = 0;
 			$action = 'Add';
+			$this->data['extras']['project_version_list'] = [];
 		} else {
 			$module = Module::withTrashed()->find($id);
 			$module->depended_module_ids = $module->parentModules()->pluck('id')->toArray();
 			$action = 'Edit';
+			$this->data['extras']['project_version_list'] = Collect(
+			ProjectVersion::select([
+				'id',
+				'number',
+			])
+				->get());
 		}
 		$this->data['module'] = $module;
 		$this->data['extras']['module_list'] = Collect(
@@ -85,27 +94,36 @@ class ModuleController extends Controller {
 				->orderBy('modules.code')
 				->get())
 		;
-		$this->data['extras']['project_version_list'] = Collect(
-			ProjectVersion::select([
+		$this->data['extras']['projects'] = Collect(
+			Project::select([
 				'id',
-				'name',
+				'code',
 			])
-			// ->orderBy('users.name')
-				->get())
+				->get())->prepend(['code' => 'Select Project'])
 		;
+		// $this->data['extras']['project_version_list'] = Collect(
+		// 	ProjectVersion::select([
+		// 		'id',
+		// 		'number',
+		// 	])
+		// 		->get())
+		// ;
 		$this->data['extras']['user_list'] = Collect(
 			User::select([
 				'id',
 				DB::raw('CONCAT(first_name," ",last_name) as name'),
 				'email',
 			])
-				->orderBy('users.name')
-				->get())
+				->get())->prepend(['name' => 'Select Assigned To'])
 		;
 		$this->data['extras']['group_list'] = Collect(
-			ModuleGroup::select('id', 'name')->orderBy('name')
-				->get())
+			ModuleGroup::where('company_id', Auth::user()->company_id)->select('id', 'name')->orderBy('name')
+				->get())->prepend(['name' => 'Select Group'])
 		;
+		// $this->data['extras']['git_branches'] = Collect(
+		// 	GitBranch::where('project_id', )->select('id', 'name')->orderBy('name')
+		// 		->get())->prepend(['name' => 'Select Group'])
+		// ;
 		$this->data['action'] = $action;
 
 		return response()->json($this->data);
