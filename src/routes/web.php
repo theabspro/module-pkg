@@ -1,7 +1,9 @@
 <?php
 
 Route::group(['namespace' => 'Abs\ModulePkg', 'middleware' => ['web', 'auth'], 'prefix' => 'module-pkg'], function () {
-	Route::get('/modules/get-list', 'ModuleController@getModuleList')->name('getModuleList');
+	Route::get('/module/get-status-wise', 'ModuleController@getStatusWiseModules')->name('getStatusWiseModules');
+	Route::get('/module/get-user-wise', 'ModuleController@getUserWiseModules')->name('getUserWiseModules');
+	Route::get('/module/get-list', 'ModuleController@getModuleList')->name('getModuleList');
 	Route::get('/module/get-form-data', 'ModuleController@getModuleFormData')->name('getModuleFormData');
 	Route::post('/module/save', 'ModuleController@saveModule')->name('saveModule');
 	Route::get('/module/delete/{id}', 'ModuleController@deleteModule')->name('deleteModule');

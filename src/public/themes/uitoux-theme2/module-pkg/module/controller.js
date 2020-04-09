@@ -1,27 +1,125 @@
-app.config(['$routeProvider', function($routeProvider) {
+app.component('statusWiseModules', {
+    templateUrl: status_wise_modules_template_url,
+    controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope, $location) {
+        $scope.loading = true;
+        var self = this;
+        self.hasPermission = HelperService.hasPermission;
 
-    $routeProvider.
-    when('/module-pkg/module/list', {
-        template: '<module-list></module-list>',
-        title: 'Modules',
-    }).
-    when('/module-pkg/module/add', {
-        template: '<module-form></module-form>',
-        title: 'Add Module',
-    }).
-    when('/module-pkg/module/edit/:id', {
-        template: '<module-form></module-form>',
-        title: 'Edit Module',
-    }).
+        $http.get(
+            laravel_routes['getStatusWiseModules'],
+        ).then(function(response) {
+            if (!response.data.success) {
+                showErrorNoty(response)
+                return;
+            }
 
-    when('/project-pkg/project-version/gantt-chart-view', {
-        template: '<project-version-gantt-chart-view></project-version-view-gantt-chart-view>',
-        title: 'View Gantt Chart',
-    })
+            console.log(response.data);
+            self.statuses = response.data.statuses;
+        });
 
-    ;
-}]);
+        //DELETE
+        $scope.deleteModule = function($id) {
+            $('#module_id').val($id);
+        }
+        $scope.deleteConfirm = function() {
+            $id = $('#module_id').val();
+            $http.get(
+                module_delete_data_url + '/' + $id,
+            ).then(function(response) {
+                if (response.data.success) {
+                    $noty = new Noty({
+                        type: 'success',
+                        layout: 'topRight',
+                        text: 'Module Deleted Successfully',
+                    }).show();
+                    setTimeout(function() {
+                        $noty.close();
+                    }, 3000);
+                    $('#modules_list').DataTable().ajax.reload(function(json) {});
+                    $location.path('/module-pkg/module/list');
+                }
+            });
+        }
 
+        //FOR FILTER
+        $('#module_code').on('keyup', function() {});
+        $('#module_name').on('keyup', function() {});
+        $('#mobile_no').on('keyup', function() {});
+        $('#email').on('keyup', function() {});
+        $scope.reset_filter = function() {
+            $("#module_name").val('');
+            $("#module_code").val('');
+            $("#mobile_no").val('');
+            $("#email").val('');
+            dataTables.fnFilter();
+        }
+
+        $rootScope.loading = false;
+    }
+});
+//------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------
+app.component('userWiseModules', {
+    templateUrl: user_wise_modules_template_url,
+    controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope, $location) {
+        $scope.loading = true;
+        var self = this;
+        self.hasPermission = HelperService.hasPermission;
+
+        $http.get(
+            laravel_routes['getUserWiseModules'],
+        ).then(function(response) {
+            if (!response.data.success) {
+                showErrorNoty(response)
+                return;
+            }
+
+            console.log(response.data);
+            self.users = response.data.users;
+        });
+
+        //DELETE
+        $scope.deleteModule = function($id) {
+            $('#module_id').val($id);
+        }
+        $scope.deleteConfirm = function() {
+            $id = $('#module_id').val();
+            $http.get(
+                module_delete_data_url + '/' + $id,
+            ).then(function(response) {
+                if (response.data.success) {
+                    $noty = new Noty({
+                        type: 'success',
+                        layout: 'topRight',
+                        text: 'Module Deleted Successfully',
+                    }).show();
+                    setTimeout(function() {
+                        $noty.close();
+                    }, 3000);
+                    $('#modules_list').DataTable().ajax.reload(function(json) {});
+                    $location.path('/module-pkg/module/list');
+                }
+            });
+        }
+
+        //FOR FILTER
+        $('#module_code').on('keyup', function() {});
+        $('#module_name').on('keyup', function() {});
+        $('#mobile_no').on('keyup', function() {});
+        $('#email').on('keyup', function() {});
+        $scope.reset_filter = function() {
+            $("#module_name").val('');
+            $("#module_code").val('');
+            $("#mobile_no").val('');
+            $("#email").val('');
+            dataTables.fnFilter();
+        }
+
+        $rootScope.loading = false;
+    }
+});
+//------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------
 
 app.component('moduleList', {
     templateUrl: module_list_template_url,

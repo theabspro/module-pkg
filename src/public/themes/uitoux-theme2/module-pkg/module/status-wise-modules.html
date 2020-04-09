@@ -1,0 +1,387 @@
+<div class="content-wrap cndn-wrap">
+    <div class="page-header">
+        <div class="page-header-inner">
+            <div class="page-header-content-left">
+                <div class="page-header-content title-block">
+                    <h1 class="title type-2">Modules (Status Wise)</h1>
+                </div><!-- Page Header Content -->
+                <div class="page-header-content button-block">
+                    <button class="btn btn-bordered" data-toggle="modal" data-target="#project-filter-modal"><i class="icon ion-md-funnel"></i>Filter</button>
+                </div><!-- Page Header Content -->
+            </div><!-- Page Header Content Left -->
+            <div class="page-header-content-right">
+                <div class="page-header-content indicator-block">
+                    <ul class="indicator-list">
+                        <li class="green">Active</li>
+                        <li class="red">Inactive</li>
+                    </ul>
+                </div><!-- Page Header Content -->
+                <div class="page-header-content search-block">
+                    <div class="search_filter">
+                        <label>
+                            <input type="search" id="search_project" class="form-control" placeholder="Search" />
+                            <button class="btn-clear" ng-click="clear_search()">Clear</button>
+                        </label>
+                    </div><!-- Search Filter -->
+                </div><!-- Page Header Content -->
+                <div class="page-header-content button-block">
+                    <a href="#!/project-pkg/project/add" class="btn btn-primary">Add New</a>
+                </div><!-- Page Header Content -->
+            </div><!-- Page Header Content Right -->
+        </div><!-- Page Header Inner -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Date Range</label>
+                    <div class="input-group date">
+                        <input class="form-control daterange align-left" placeholder="Select a Date Range" name="invoice_date" id="invoice_date" value="" autocomplete="off">
+                        <span class="input-group-addon">
+                            <img class="img-responsive" ng-src="{{theme}}/img/content/calender-gray-icon.svg" alt="Calendar Image" />
+                        </span>
+                    </div><!-- Input Group -->
+                </div><!-- Feild -->
+            </div>
+            <div class="col-md-3">
+                <div class="input-text form-group">
+                    <label>Employee</label>
+                    <md-select multiple ng-model="$ctrl.field_group_ids" placeholder="Select Field Group" data-md-container-class="selectdemoSelectHeader">
+                        <md-select-header class="demo-select-header">
+                            <md-button layout-fill value="all" ng-if="$ctrl.field_group_ids.length != $ctrl.extras.field_group_list.length" ng-click="selectAllFieldGroups()">SELECT ALL</md-button>
+                            <md-button layout-fill value="all" ng-if="$ctrl.field_group_ids.length == $ctrl.extras.field_group_list.length" ng-click="deselectAllFieldGroups()">DESELECT ALL</md-button>
+                            <!-- <input ng-model="searchRoles" type="search" placeholder="Search Role" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()"> -->
+                        </md-select-header>
+                        <md-optgroup label="Field Group List">
+                            <md-option ng-value="type.id" ng-repeat="type in $ctrl.extras.field_group_list | filter:searchTravel">{{type.name}}</md-option>
+                        </md-optgroup>
+                    </md-select>
+                    <input type="hidden" name="field_group_id" value='{{$ctrl.field_group_ids}}'>
+                </div><!-- Feild -->
+            </div><!-- Column -->
+            <div class="col-md-3">
+                <div class="input-text form-group">
+                    <label>Project</label>
+                    <md-select multiple ng-model="$ctrl.field_group_ids" placeholder="Select Field Group" data-md-container-class="selectdemoSelectHeader">
+                        <md-select-header class="demo-select-header">
+                            <md-button layout-fill value="all" ng-if="$ctrl.field_group_ids.length != $ctrl.extras.field_group_list.length" ng-click="selectAllFieldGroups()">SELECT ALL</md-button>
+                            <md-button layout-fill value="all" ng-if="$ctrl.field_group_ids.length == $ctrl.extras.field_group_list.length" ng-click="deselectAllFieldGroups()">DESELECT ALL</md-button>
+                            <!-- <input ng-model="searchRoles" type="search" placeholder="Search Role" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()"> -->
+                        </md-select-header>
+                        <md-optgroup label="Field Group List">
+                            <md-option ng-value="type.id" ng-repeat="type in $ctrl.extras.field_group_list | filter:searchTravel">{{type.name}}</md-option>
+                        </md-optgroup>
+                    </md-select>
+                    <input type="hidden" name="field_group_id" value='{{$ctrl.field_group_ids}}'>
+                </div><!-- Feild -->
+            </div><!-- Column -->
+            <div class="col-md-3">
+                <div class="input-text form-group">
+                    <label>Status</label>
+                    <md-select multiple ng-model="$ctrl.field_group_ids" placeholder="Select Field Group" data-md-container-class="selectdemoSelectHeader">
+                        <md-select-header class="demo-select-header">
+                            <md-button layout-fill value="all" ng-if="$ctrl.field_group_ids.length != $ctrl.extras.field_group_list.length" ng-click="selectAllFieldGroups()">SELECT ALL</md-button>
+                            <md-button layout-fill value="all" ng-if="$ctrl.field_group_ids.length == $ctrl.extras.field_group_list.length" ng-click="deselectAllFieldGroups()">DESELECT ALL</md-button>
+                            <!-- <input ng-model="searchRoles" type="search" placeholder="Search Role" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()"> -->
+                        </md-select-header>
+                        <md-optgroup label="Field Group List">
+                            <md-option ng-value="type.id" ng-repeat="type in $ctrl.extras.field_group_list | filter:searchTravel">{{type.name}}</md-option>
+                        </md-optgroup>
+                    </md-select>
+                    <input type="hidden" name="field_group_id" value='{{$ctrl.field_group_ids}}'>
+                </div><!-- Feild -->
+            </div><!-- Column -->
+        </div>
+    </div><!-- Page Header -->
+    <div class="page-main-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3" ng-repeat="(key, status) in $ctrl.statuses">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                {{status.name}}
+                                <a href="javascript:;" ng-click="addModule({'status':status})" class="btn btn-primary pull-right">
+                                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                </a>
+                            </h3>
+                        </div>
+                        <hr />
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        12 Mar (Wed)
+                                        <a href="javascript:;" ng-click="addModule({'status':status})" class="btn btn-primary pull-right">
+                                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                        </a>
+                                        <br />
+                                        <span class="badge"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>1</span>
+                                        <span class="badge"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>2</span>
+                                    </h3>
+                                </div>
+                                <ul class="list-group" dnd-list="status.modules">
+                                    <li ng-repeat="(key, module) in status.modules" class="list-group-item list-group-item-success" ng-click="addModule({'status':status})" dnd-draggable="module" dnd-effect-allowed="move" dnd-moved="status.modules.splice($index, 1)">
+                                        <span class="label label-default">
+                                            {{module.assigned_to.first_name}}
+                                            {{module.assigned_to.last_name}}
+                                        </span>
+                                        <span class="label label-primary">
+                                            EH : {{module.duration}} Hrs
+                                        </span>
+                                        <span class="label label-success">
+                                            ED : {{module.start_date}} to {{module.end_date}}
+                                        </span>
+                                        <span class="label label-danger">
+                                            {{module.completed_percentage}}%
+                                        </span>
+                                        <span class="label label-info">{{module.name}}</span>
+                                        <br />
+                                        {{module.code}} : {{module.name}}
+                                    </li>
+                                </ul>
+                                <div class="panel-footer">
+                                    Tasks : 8 / EH : 8 / AH : 8.5
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            &nbsp;
+                        </div>
+                    </div>
+                </div><!-- Column -->
+            </div><!-- Row -->
+        </div><!-- Container -->
+    </div><!-- Page Main Content -->
+</div><!-- Content Wrap -->
+<!-- Task Form Modal -->
+<div class="modal fade filter" id="task-form-modal" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close ripple" data-dismiss="modal" aria-label="Close"><i class="icon ion-md-close"></i></button>
+                <h5 class="modal-title" id="myModalLabel">Add Task</h5>
+            </div><!-- Modal Header -->
+            <form id="task_form">
+                <input type="hidden" name="id" value="{{$ctrl.task.id}}">
+                <div class="modal-body">
+                    <div class="modal-form">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Task Date <sup class="mandatory">*</sup> </label>
+                                    <div class="input-group date" data-provide="datepicker">
+                                        <input class="form-control  align-left" placeholder="Select a Date" name="date" id="date" value="" autocomplete="off">
+                                        <span class="input-group-addon">
+                                            <img class="img-responsive" ng-src="{{theme}}/img/content/calender-gray-icon.svg" alt="Calendar Image" />
+                                        </span>
+                                    </div><!-- Input Group -->
+                                </div><!-- Feild -->
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="separate-form-group">
+                                    <label>Assigned To <sup class="mandatory">*</sup> </label>
+                                    <ui-select ng-model="$ctrl.task.assigned_to_id" theme="select2">
+                                        <ui-select-match placeholder="Select Assigned To">
+                                            {{$select.selected.name || $select.selected}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="i.id as i in $ctrl.users_list | propsFilter: {name: $select.search}">
+                                            <div ng-bind-html="i.name | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <input type="hidden" name="assigned_to_id" id="assigned_to_id" value="{{$ctrl.task.assigned_to_id}}">
+                                </div><!-- Field -->
+                            </div><!-- Column -->
+                        </div>
+                        <!--row-->
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="separate-form-group">
+                                    <label>Project <sup class="mandatory">*</sup> </label>
+                                    <ui-select ng-model="$ctrl.task.project_id" theme="select2" ng-change="onSelectedProject($ctrl.task.project_id);$ctrl.task.project_version='';$ctrl.task.module=''">
+                                        <ui-select-match placeholder="Select Project">
+                                            {{$select.selected.name || $select.selected}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="i.id as i in $ctrl.project_list | propsFilter: {name: $select.search}">
+                                            <div ng-bind-html="i.name | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <input type="hidden" name="project_id" id="project_id" value="{{$ctrl.task.project_id}}">
+                                </div><!-- Field -->
+                            </div><!-- Column -->
+                            <div class="col-sm-6">
+                                <div class="separate-form-group">
+                                    <label>Project Version</label>
+                                    <ui-select ng-model="$ctrl.task.project_version" theme="select2" ng-change="onSelectedProjectVersion($ctrl.task.project_version);$ctrl.task.module=''">
+                                        <ui-select-match placeholder="Select Project Version">
+                                            {{$select.selected.name || $select.selected}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="i.id as i in $ctrl.project_version_list | propsFilter: {name: $select.search}">
+                                            <div ng-bind-html="i.name | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <input type="hidden" name="project_version_id" id="project_version_id" value="{{$ctrl.task.project_version}}">
+                                </div><!-- Field -->
+                            </div><!-- Column -->
+                        </div>
+                        <!--row-->
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="separate-form-group">
+                                    <label>Module</label>
+                                    <ui-select ng-model="$ctrl.task.module_id" theme="select2">
+                                        <ui-select-match placeholder="Select Module">
+                                            {{$select.selected.name || $select.selected}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="i.id as i in $ctrl.module_list | propsFilter: {name: $select.search}">
+                                            <div ng-bind-html="i.name | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <input type="hidden" name="module_id" id="module_id" value="{{$ctrl.task.module_id}}">
+                                </div><!-- Field -->
+                            </div><!-- Column -->
+                            <div class="col-sm-6">
+                                <div class="separate-form-group">
+                                    <label>Type</label>
+                                    <ui-select ng-model="$ctrl.task.type_id" theme="select2">
+                                        <ui-select-match placeholder="Select Task Type">
+                                            {{$select.selected.name || $select.selected}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="i.id as i in $ctrl.task_type_list | propsFilter: {name: $select.search}">
+                                            <div ng-bind-html="i.name | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <input type="hidden" name="type_id1" id="type_id" value="{{$ctrl.task.type_id}}">
+                                </div><!-- Field -->
+                            </div><!-- Column -->
+                        </div>
+                        <!--row-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Subject<sup class="mandatory">*</sup></label>
+                                    <input type="text" class="form-control" id="subject" name="subject" placeholder="Enter Task Subject" autocomplete="off">
+                                </div><!-- Field -->
+                            </div><!-- Column -->
+                            <div class="col-sm-6">
+                                <div class="separate-form-group">
+                                    <label>Status</label>
+                                    <ui-select ng-model="$ctrl.task.status_id" theme="select2">
+                                        <ui-select-match placeholder="Select Task Status">
+                                            {{$select.selected.name || $select.selected}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="i.id as i in $ctrl.task_type_list | propsFilter: {name: $select.search}">
+                                            <div ng-bind-html="i.name | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <input type="hidden" name="status_id" id="status_id" value="{{$ctrl.task.status_id}}">
+                                </div><!-- Field -->
+                            </div><!-- Column -->
+                        </div>
+                        <!--row-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Estimated Hours<sup class="mandatory">*</sup></label>
+                                    <input type="text" class="form-control" id="estimated_hours" name="estimated_hours" placeholder="Enter Estimated Hours" autocomplete="off">
+                                </div><!-- Field -->
+                            </div><!-- Column -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Actual Hours<sup class="mandatory">*</sup></label>
+                                    <input type="text" class="form-control" id="actual_hours" name="actual_hours" placeholder="Enter Actual Hours" autocomplete="off">
+                                </div><!-- Field -->
+                            </div><!-- Column -->
+                        </div>
+                        <!--row-->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea class="form-control" id="description" name="description" autocomplete="off"></textarea>
+                                </div><!-- Field -->
+                            </div><!-- Column -->
+                        </div>
+                        <!--row-->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Remarks</label>
+                                    <textarea class="form-control" id="remarks" name="remarks" autocomplete="off"></textarea>
+                                </div><!-- Field -->
+                            </div><!-- Column -->
+                        </div>
+                        <!--row-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-rose" ng-click="">
+                                    Submit
+                                </button>
+                            </div>
+                        </div><!-- Row -->
+                    </div><!-- Modal Form -->
+                </div><!-- Modal Body -->
+            </form>
+        </div><!-- Modal Content -->
+    </div><!-- Modal Dialog -->
+</div><!-- Modal -->
+<!-- Filter Modal -->
+<div class="modal fade filter" id="project-filter-modal" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close ripple" data-dismiss="modal" aria-label="Close"><i class="icon ion-md-close"></i></button>
+                <h5 class="modal-title" id="myModalLabel">Project Filter</h5>
+            </div><!-- Modal Header -->
+            <div class="modal-body">
+                <div class="modal-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Project Code</label>
+                                <input type="text" class="form-control" id="project_code" name="project_code" placeholder="Enter Project Code" autocomplete="off">
+                            </div><!-- Field -->
+                        </div><!-- Column -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Project Name</label>
+                                <input type="text" class="form-control" id="project_name" name="project_name" placeholder="Enter Project Name" autocomplete="off">
+                            </div><!-- Field -->
+                        </div><!-- Column -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Mobile Number</label>
+                                <input type="text" class="form-control" id="mobile_no" name="mobile_no" placeholder="Enter Mobile Number" autocomplete="off">
+                            </div><!-- Field -->
+                        </div><!-- Column -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="text" class="form-control" id="email" name="email" placeholder="Enter Email" autocomplete="off">
+                            </div><!-- Field -->
+                        </div><!-- Column -->
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-rose" ng-click="reset_filter()">Reset Filter</button>
+                        </div>
+                    </div><!-- Row -->
+                </div><!-- Modal Form -->
+            </div><!-- Modal Body -->
+        </div><!-- Modal Content -->
+    </div><!-- Modal Dialog -->
+</div><!-- Modal -->
+<!-- Modal -->
+<div class="modal fade alert-modal failure" id="delete_project" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">ARE YOU SURE?</h4>
+            </div>
+            <div class="modal-body">
+                <h5>Delete</h5>
+                <p>You can’t retrive the data again, Are you sure you want to delete? </p>
+                <input type="hidden" name="project_id" id="project_id" value="">
+                <button class="btn btn-grey" data-dismiss="modal" aria-label="Close">Cancel</button>
+                <button class="btn btn-rose" ng-click="deleteConfirm()" type="button" data-dismiss="modal" aria-label="Close">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->

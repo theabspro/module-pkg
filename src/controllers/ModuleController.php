@@ -5,9 +5,9 @@ use Abs\ModulePkg\Module;
 use Abs\ModulePkg\ModuleGroup;
 use Abs\ProjectPkg\Project;
 use Abs\ProjectPkg\ProjectVersion;
-use Abs\StatusPkg\Status;
 use App\Address;
 use App\Http\Controllers\Controller;
+use App\Status;
 use App\User;
 use Auth;
 use Carbon\Carbon;
@@ -19,6 +19,53 @@ use Yajra\Datatables\Datatables;
 class ModuleController extends Controller {
 
 	public function __construct() {
+	}
+
+	public function getStatusWiseModules(Request $request) {
+		$statuses = Status::with([
+			'modules' => function ($q) use ($request) {
+				if ($request->project_version_id) {
+					$query->where('modules.project_version_id', $request->project_version_id)->keyBy('id');
+				}
+			},
+			'modules.assignedTo',
+		])
+			->where('type_id', 161)
+			->where(function ($query) use ($request) {
+				if ($request->status_ids) {
+					$query->whereIn('statuses.id', $request->status_ids);
+				}
+			})
+			->get()
+			->keyBy('id')
+		;
+		return response()->json([
+			'success' => true,
+			'statuses' => $statuses,
+		]);
+	}
+
+	public function getUserWiseModules(Request $request) {
+		$users = User::with([
+			'modules' => function ($q) use ($request) {
+				if ($request->project_version_id) {
+					$query->where('modules.project_version_id', $request->project_version_id)->keyBy('id');
+				}
+			},
+			'modules.assignedTo',
+		])
+			->where(function ($query) use ($request) {
+				if ($request->user_ids) {
+					$query->whereIn('users.id', $request->user_ids);
+				}
+			})
+			->get()
+			->keyBy('id')
+		;
+		return response()->json([
+			'success' => true,
+			'users' => $users,
+		]);
 	}
 
 	public function getModuleList(Request $request) {
