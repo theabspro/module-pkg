@@ -25,15 +25,20 @@ class ModuleController extends Controller {
 		$modules = Module::withTrashed()
 			->join('project_versions as pv', 'modules.project_version_id', 'pv.id')
 			->join('projects as p', 'pv.project_id', 'p.id')
+			->leftJoin('statuses', 'statuses.id', 'modules.status_id')
 			->leftJoin('module_groups as mg', 'modules.group_id', 'mg.id')
 			->leftJoin('users as at', 'modules.assigned_to_id', 'at.id')
+			->leftJoin('module_parent_module as mpm', 'modules.id', 'mpm.module_id')
 			->select([
 				'modules.id',
 				DB::raw('CONCAT(p.short_name," / ",p.code) as project_name'),
 				'pv.number as project_version_number',
 				DB::raw('CONCAT(at.first_name," ",at.last_name) as assigned_to'),
+				DB::raw('COUNT(mpm.parent_module_id) as dependancy_count'),
 				'modules.name',
 				'mg.name as group_name',
+				'statuses.name as status_name',
+				'modules.priority',
 				DB::raw('date_format(modules.start_date,"%d-%m-%Y") as start_date'),
 				DB::raw('date_format(modules.end_date,"%d-%m-%Y") as end_date'),
 				'modules.duration as duration',
@@ -46,6 +51,7 @@ class ModuleController extends Controller {
 					$query->where('modules.code', 'LIKE', '%' . $request->module_code . '%');
 				}
 			})
+			->groupBy('modules.id')
 			->orderBy('at.id', 'asc')
 			->orderBy('modules.duration', 'asc')
 		;

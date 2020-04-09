@@ -77,12 +77,16 @@ app.component('moduleList', {
                 { data: 'project_name', name: 'p.name' },
                 { data: 'project_version_number', name: 'pv.number' },
                 { data: 'name', name: 'modules.name' },
+                { data: 'status_name', name: 'statuses.name' },
+                { data: 'priority', name: 'modules.priority' },
                 { data: 'assigned_to', name: 'at.name' },
+                { data: 'duration', searchable: false },
+                { data: 'completed_percentage', searchable: false },
                 { data: 'group_name', name: 'mg.name' },
                 { data: 'start_date', searchable: false },
                 { data: 'end_date', searchable: false },
-                { data: 'duration', searchable: false },
-                { data: 'completed_percentage', searchable: false },
+                { data: 'dependancy_count', searchable: false },
+
             ],
             "infoCallback": function(settings, start, end, max, total, pre) {
                 $('#table_info').html(total)
