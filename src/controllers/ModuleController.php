@@ -211,7 +211,8 @@ class ModuleController extends Controller {
 					'min:3',
 					'unique:modules,name,' . $request->id . ',id,project_version_id,' . Auth::user()->company_id,
 				],
-				'duration' => 'required|numeric',
+				'status_id' => 'required|numeric',
+				'duration' => 'nullable|numeric',
 			], $error_messages);
 			if ($validator->fails()) {
 				return response()->json(['success' => false, 'errors' => $validator->errors()->all()]);
@@ -340,6 +341,22 @@ class ModuleController extends Controller {
 			'success' => true,
 			'gantt_chart_data' => $data,
 			'filtered_module_ids' => $r->filtered_module_ids,
+		]);
+	}
+
+	public function updateModulePriority(Request $r) {
+		$module = Module::find($r->id);
+		if (!$module) {
+			return response()->json([
+				'success' => false,
+				'error' => 'Module not found',
+			]);
+		}
+		$module->priority = $r->priority;
+		$module->save();
+		return response()->json([
+			'success' => true,
+			'error' => 'Module priority updated successfully',
 		]);
 	}
 }

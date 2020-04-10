@@ -6,12 +6,13 @@ Route::group(['namespace' => 'Abs\ModulePkg', 'middleware' => ['web', 'auth'], '
 	Route::get('/module/get-list', 'ModuleController@getModuleList')->name('getModuleList');
 	Route::get('/module/get-form-data', 'ModuleController@getModuleFormData')->name('getModuleFormData');
 	Route::post('/module/save', 'ModuleController@saveModule')->name('saveModule');
+	Route::post('/module/update-priority', 'ModuleController@updateModulePriority')->name('updateModulePriority');
 	Route::get('/module/delete/{id}', 'ModuleController@deleteModule')->name('deleteModule');
 
 	Route::get('/module-groups/get-list', 'ModuleGroupController@getModuleGroupList')->name('getModuleGroupList');
-	Route::get('/module-group/get-form-data/{id?}', 'ModuleGroupController@getModuleGroupFormData')->name('getModuleGroupFormData');
-	Route::post('/module-group/save', 'ModuleGroupController@saveModule')->name('saveModuleGroup');
-	Route::get('/module-group/delete/{id}', 'ModuleGroupController@deleteModule')->name('deleteModuleGroup');
+	Route::get('/module-group/get-form-data/', 'ModuleGroupController@getModuleGroupFormData')->name('getModuleGroupFormData');
+	Route::post('/module-group/save', 'ModuleGroupController@saveModuleGroup')->name('saveModuleGroup');
+	Route::get('/module-group/delete/', 'ModuleGroupController@deleteModuleGroup')->name('deleteModuleGroup');
 
 	Route::get('/getGanttChartFormData', 'ModuleController@getGanttChartFormData')->name('getGanttChartFormData');
 	Route::get('/getGanttChartData', 'ModuleController@getGanttChartData')->name('getGanttChartData');
