@@ -23,7 +23,7 @@ class ModulesC extends Migration {
 				$table->datetime('start_date')->nullable();
 				$table->datetime('end_date')->nullable();
 				$table->unsignedDecimal('duration', 12, 2)->nullable();
-				$table->unsignedDecimal('completed_percentage', 5, 2);
+				$table->unsignedTinyInteger('completed_percentage');
 				$table->unsignedInteger('status_id')->nullable();
 				$table->unsignedInteger('assigned_to_id')->nullable();
 				$table->text('remarks')->nullable();
@@ -34,6 +34,8 @@ class ModulesC extends Migration {
 				$table->unsignedInteger('deleted_by_id')->nullable();
 				$table->timestamps();
 				$table->softdeletes();
+
+				$table->foreign('project_version_id')->references('id')->on('project_versions')->onDelete('cascade')->onUpdate('cascade');
 
 				$table->foreign('group_id')->references('id')->on('module_groups')->onDelete('SET NULL')->onUpdate('cascade');
 

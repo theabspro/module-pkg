@@ -59,6 +59,10 @@ class Module extends Model {
 		return $this->belongsTo('App\User', 'assigned_to_id');
 	}
 
+	public function status() {
+		return $this->belongsTo('App\Status');
+	}
+
 	public function projectVersion() {
 		return $this->belongsTo('Abs\ProjectPkg\ProjectVersion');
 	}

@@ -342,4 +342,20 @@ class ModuleController extends Controller {
 			'filtered_module_ids' => $r->filtered_module_ids,
 		]);
 	}
+
+	public function updateModulePriority(Request $r) {
+		$module = Module::find($r->id);
+		if (!$module) {
+			return response()->json([
+				'success' => false,
+				'error' => 'Module not found',
+			]);
+		}
+		$module->priority = $r->priority;
+		$module->save();
+		return response()->json([
+			'success' => true,
+			'error' => 'Module priority updated successfully',
+		]);
+	}
 }
