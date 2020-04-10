@@ -211,7 +211,8 @@ class ModuleController extends Controller {
 					'min:3',
 					'unique:modules,name,' . $request->id . ',id,project_version_id,' . Auth::user()->company_id,
 				],
-				'duration' => 'required|numeric',
+				'status_id' => 'required|numeric',
+				'duration' => 'nullable|numeric',
 			], $error_messages);
 			if ($validator->fails()) {
 				return response()->json(['success' => false, 'errors' => $validator->errors()->all()]);
