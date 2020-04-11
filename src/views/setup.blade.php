@@ -35,6 +35,20 @@
 	    when('/project-pkg/project-version/gantt-chart-view', {
 	        template: '<project-version-gantt-chart-view></project-version-view-gantt-chart-view>',
 	        title: 'View Gantt Chart',
+	    }).
+
+	    //MODULE GROUPS
+	    when('/module-pkg/module-group/list', {
+	        template: '<module-group-list></module-group-list>',
+	        title: 'Module Groups',
+	    }).
+	    when('/module-pkg/module-group/add', {
+	        template: '<module-group-form></module-group-form>',
+	        title: 'Add Module Group',
+	    }).
+	    when('/module-pkg/module-group/edit/:id', {
+	        template: '<module-group-form></module-group-form>',
+	        title: 'Edit Module Group',
 	    })
 
 	    ;
@@ -46,7 +60,12 @@
     var module_list_template_url = "{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module/list.html')}}";
     var module_form_template_url = "{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module/form.html')}}";
     var project_version_gantt_chart_view_template_url = "{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module/gantt-chart.html')}}";
+
+    //MODULE GROUPS
+    var module_group_list_template_url = "{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module-group/list.html')}}";
+    var module_group_form_template_url = "{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module-group/form.html')}}";
 </script>
 <script type="text/javascript" src="{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module/controller.js?v=2')}}"></script>
+<script type="text/javascript" src="{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module-group/controller.js?v=2')}}"></script>
 
 

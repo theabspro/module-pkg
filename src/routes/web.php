@@ -12,9 +12,9 @@ Route::group(['namespace' => 'Abs\ModulePkg', 'middleware' => ['web', 'auth'], '
 	Route::get('/module/get-filter-data', 'ModuleController@getModuleFilterData')->name('getModuleFilterData');
 
 	Route::get('/module-groups/get-list', 'ModuleGroupController@getModuleGroupList')->name('getModuleGroupList');
-	Route::get('/module-group/get-form-data/{id?}', 'ModuleGroupController@getModuleGroupFormData')->name('getModuleGroupFormData');
-	Route::post('/module-group/save', 'ModuleGroupController@saveModule')->name('saveModuleGroup');
-	Route::get('/module-group/delete/{id}', 'ModuleGroupController@deleteModule')->name('deleteModuleGroup');
+	Route::get('/module-group/get-form-data/', 'ModuleGroupController@getModuleGroupFormData')->name('getModuleGroupFormData');
+	Route::post('/module-group/save', 'ModuleGroupController@saveModuleGroup')->name('saveModuleGroup');
+	Route::get('/module-group/delete/', 'ModuleGroupController@deleteModuleGroup')->name('deleteModuleGroup');
 
 
 	Route::get('/getGanttChartFormData', 'ModuleController@getGanttChartFormData')->name('getGanttChartFormData');

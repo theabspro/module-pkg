@@ -55,6 +55,10 @@ class Module extends Model {
 		return $this->belongsToMany('Abs\ModulePkg\Module', 'module_parent_module', 'parent_module_id', 'module_id');
 	}
 
+	public function phases() {
+		return $this->belongsToMany('Abs\ProjectPkg\Phase', 'phase_module', 'module_id', 'phase_id');
+	}
+
 	public function assignedTo() {
 		return $this->belongsTo('App\User', 'assigned_to_id');
 	}
