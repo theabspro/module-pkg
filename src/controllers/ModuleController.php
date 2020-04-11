@@ -71,6 +71,7 @@ class ModuleController extends Controller {
 	}
 
 	public function getModuleList(Request $request) {
+		//dd($request->all());
 		if (!empty($request->start_date)) {
 			$start_date = explode('to', $request->start_date);
 			$start_from_date = date('Y-m-d', strtotime($start_date[0]));
@@ -87,8 +88,23 @@ class ModuleController extends Controller {
 			$end_from_date = '';
 			$end_to_date = '';
 		}
+		if(!empty($request->status_id)){
+			$status_ids = explode(',', $request->status_id);
+		}else{
+			$status_ids='';
+		}
+		if(!empty($request->assigned_to_id)){
+			$assigned_to_ids = explode(',', $request->assigned_to_id);
+		}else{
+			$assigned_to_ids='';
+		}
+		if(!empty($request->platform_id)){
+			$platform_ids = explode(',', $request->platform_id);
+		}else{
+			$platform_ids='';
+		}
 
-		//dd($request->all());
+		//dd($status_ids);
 		$modules = Module::withTrashed()
 			->join('project_versions as pv', 'modules.project_version_id', 'pv.id')
 			->join('projects as p', 'pv.project_id', 'p.id')
@@ -127,28 +143,27 @@ class ModuleController extends Controller {
 			})
 			->where(function ($query) use ($request) {
 				if (!empty($request->project_version_id)) {
-					$query->whereIn('modules.project_version_id', [$request->project_version_id]);
+					$query->where('modules.project_version_id', $request->project_version_id);
 				}
 			})
-			->where(function ($query) use ($request) {
-				if (!empty($request->assigned_to_id) && $request->assigned_to_id != '<%$ctrl.module.assigned_to_ids%>') {
-					$query->whereIn('modules.assigned_to_id', [$request->assigned_to_id]);
+			->where(function ($query) use ($assigned_to_ids) {
+				if (!empty($assigned_to_ids)) {
+					$query->whereIn('modules.assigned_to_id', $assigned_to_ids);
 				}
 			})
 			->where(function ($query) use ($request) {
 				if (!empty($request->tester_id)) {
-					//dd($request->tester_id);
 					$query->where('modules.tester_id', $request->tester_id);
 				}
 			})
-			->where(function ($query) use ($request) {
-				if (!empty($request->status_id) && $request->status_id != '<%$ctrl.module.status_ids%>') {
-					$query->whereIn('modules.status_id', [$request->status_id]);
+			->where(function ($query) use ($status_ids) {
+				if (!empty($status_ids)) {
+					$query->whereIn('modules.status_id', $status_ids);
 				}
 			})
-			->where(function ($query) use ($request) {
-				if (!empty($request->platform_id) && $request->platform_id != '<%$ctrl.module.platform_ids%>') {
-					$query->whereIn('modules.platform_id', [$request->platform_id]);
+			->where(function ($query) use ($platform_ids) {
+				if (!empty($platform_ids)) {
+					$query->whereIn('modules.platform_id', $platform_ids);
 				}
 			})
 			->where(function ($query) use ($start_from_date, $start_to_date) {

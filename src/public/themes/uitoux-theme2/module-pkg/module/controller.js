@@ -131,6 +131,7 @@ app.component('moduleList', {
             laravel_routes['getModuleFilterData']
         ).then(function(response) {
             self.filter = response.data.filter;
+            self.filter.project_version_list = [];
             console.log(self.filter);
             $rootScope.loading = false;
         });
