@@ -37,11 +37,6 @@
                                             General Information
                                         </a>
                                     </li>
-                                    <li>
-                                        <a class="filter active" data-target="#dependancy" data-toggle="tab" aria-expanded="true" ng-shortcut="'meta+2'" ng-shortcut-click>
-                                            Dependancy
-                                        </a>
-                                    </li>
                                 </ul>
                             </div><!-- Filters -->
                         </div><!-- Tab Header -->
@@ -56,12 +51,13 @@
                                             <div class="input-text form-group">
                                                 <label>
                                                     Project
+                                                    <sup class="mandatory">*</sup>
                                                 </label>
-                                                <md-select ng-model="$ctrl.module.project" placeholder="Select Project" data-md-container-class="selectdemoSelectHeader" ng-change="projectChanged();" ng-model-options="{trackBy: '$value.id' }">
+                                                <md-select ng-model="$ctrl.module.project" placeholder="Select Project" data-md-container-class="selectdemoSelectHeader" ng-change="projectChanged();$ctrl.module.project_version='';" ng-model-options="{trackBy: '$value.id' }">
                                                     <md-select-header class="demo-select-header ng-hide">
-                                                        <input ng-model="searchAssignee" type="search" placeholder="Search Assignee" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                        <input ng-model="searchProject" type="search" placeholder="Select Project" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
                                                     </md-select-header>
-                                                    <md-optgroup label="Assigned To">
+                                                    <md-optgroup label="Select Project">
                                                         <md-option ng-value="item" ng-repeat="item in $ctrl.extras.project_list | filter:searchTravel">
                                                             {{item.short_name}} /
                                                             {{item.code}}
@@ -75,20 +71,38 @@
                                             <div class="input-text form-group">
                                                 <label>
                                                     Project Version
+                                                    <sup class="mandatory">*</sup>
                                                 </label>
-                                                <md-select ng-model="$ctrl.module.project_version" placeholder="Select Project Version" data-md-container-class="selectdemoSelectHeader" ng-model-options="{trackBy: '$value.id' }">
+                                                <md-select ng-model="$ctrl.module.project_version" placeholder="Select Project Version" ng-change="versionChanged();" data-md-container-class="selectdemoSelectHeader" ng-model-options="{trackBy: '$value.id' }">
                                                     <md-select-header class="demo-select-header ng-hide">
-                                                        <input ng-model="searchAssignee" type="search" placeholder="Search Assignee" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                        <input ng-model="searchAssignee" type="search" placeholder="Search Project Version" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
                                                     </md-select-header>
-                                                    <md-optgroup label="Assigned To">
+                                                    <md-optgroup label="Project Version">
                                                         <md-option ng-value="item" ng-repeat="item in $ctrl.extras.project_version_list | filter:searchTravel">
-                                                            {{item.number}}
+                                                            {{item.name}}
                                                         </md-option>
                                                     </md-optgroup>
                                                 </md-select>
                                                 <input type="hidden" name="project_version_id" value='{{$ctrl.module.project_version.id}}'>
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>Depends On </label>
+                                                <md-select multiple ng-model="$ctrl.module.depended_module_ids" placeholder="Select Depended Modules" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header">
+                                                        <md-button layout-fill value="all" ng-if="$ctrl.module.depended_module_ids.length != $ctrl.extras.module_list.length" ng-click="selectAllFieldGroups()">SELECT ALL</md-button>
+                                                        <md-button layout-fill value="all" ng-if="$ctrl.module.depended_module_ids.length == $ctrl.extras.module_list.length" ng-click="deselectAllFieldGroups()">DESELECT ALL</md-button>
+                                                    </md-select-header>
+                                                    <md-optgroup label="Depended Modules">
+                                                        <md-option ng-value="item.id" ng-repeat="item in $ctrl.extras.module_list | filter:searchTravel">
+                                                            {{item.name}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="depended_module_ids" value='{{$ctrl.module.depended_module_ids}}'>
+                                            </div>
+                                        </div>
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>
@@ -98,6 +112,9 @@
                                                 <input type="text" class="form-control focus" ng-model="$ctrl.module.name" name="name" placeholder="Enter Module Name" ng-shortcut="'shift+f'" ng-shortcut-focus />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
+                                    </div>
+                                    <!--row-->
+                                    <div class="row">
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>
@@ -155,9 +172,9 @@
                                                 <label>
                                                     Assigned To
                                                 </label>
-                                                <md-select ng-model="$ctrl.module.assigned_to_id" placeholder="Select Assignee" data-md-container-class="selectdemoSelectHeader">
+                                                <md-select ng-model="$ctrl.module.assigned_to_id" placeholder="Select Assigned To" data-md-container-class="selectdemoSelectHeader">
                                                     <md-select-header class="demo-select-header ng-hide">
-                                                        <input ng-model="searchAssignee" type="search" placeholder="Search Assignee" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                        <input ng-model="searchAssignee" type="search" placeholder="Search Assigned To" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
                                                     </md-select-header>
                                                     <md-optgroup label="Assigned To">
                                                         <md-option ng-value="item.id" ng-repeat="item in $ctrl.extras.user_list | filter:searchTravel">
@@ -174,11 +191,11 @@
                                                 <label>
                                                     Tester
                                                 </label>
-                                                <md-select ng-model="$ctrl.module.tester_id" placeholder="Select Assignee" data-md-container-class="selectdemoSelectHeader">
+                                                <md-select ng-model="$ctrl.module.tester_id" placeholder="Select Tester" data-md-container-class="selectdemoSelectHeader">
                                                     <md-select-header class="demo-select-header ng-hide">
-                                                        <input ng-model="searchAssignee" type="search" placeholder="Search Assignee" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                        <input ng-model="searchTester" type="search" placeholder="Search Tester" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
                                                     </md-select-header>
-                                                    <md-optgroup label="Assigned To">
+                                                    <md-optgroup label="Tester">
                                                         <md-option ng-value="item.id" ng-repeat="item in $ctrl.extras.user_list | filter:searchTravel">
                                                             {{item.name}} /
                                                             {{item.email}}
@@ -193,9 +210,9 @@
                                                 <label>
                                                     Branch
                                                 </label>
-                                                <md-select ng-model="$ctrl.module.source_branch_id" placeholder="Select Assignee" data-md-container-class="selectdemoSelectHeader">
+                                                <md-select ng-model="$ctrl.module.source_branch_id" placeholder="Select Branch" data-md-container-class="selectdemoSelectHeader">
                                                     <md-select-header class="demo-select-header ng-hide">
-                                                        <input ng-model="searchAssignee" type="search" placeholder="Search Assignee" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                        <input ng-model="searchBranch" type="search" placeholder="Search Branch" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
                                                     </md-select-header>
                                                     <md-optgroup label="Assigned To">
                                                         <md-option ng-value="item.id" ng-repeat="item in $ctrl.extras.git_branch_list | filter:searchTravel">
@@ -211,11 +228,11 @@
                                                 <label>
                                                     Platform
                                                 </label>
-                                                <md-select ng-model="$ctrl.module.platform_id" placeholder="Select Assignee" data-md-container-class="selectdemoSelectHeader">
+                                                <md-select ng-model="$ctrl.module.platform_id" placeholder="Select Platform" data-md-container-class="selectdemoSelectHeader">
                                                     <md-select-header class="demo-select-header ng-hide">
-                                                        <input ng-model="searchAssignee" type="search" placeholder="Search Assignee" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                        <input ng-model="searchPlatform" type="search" placeholder="Search Assignee" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
                                                     </md-select-header>
-                                                    <md-optgroup label="Assigned To">
+                                                    <md-optgroup label="Platform To">
                                                         <md-option ng-value="item.id" ng-repeat="item in $ctrl.extras.platform_list | filter:searchTravel">
                                                             {{item.name}}
                                                         </md-option>
@@ -238,7 +255,7 @@
                                                 <label>
                                                     Description
                                                 </label>
-                                                <textarea name="address" ng-model="$ctrl.module.address" class="form-control" rows="3" placeholder="Enter Address"></textarea>
+                                                <textarea name="description" ng-model="$ctrl.module.description" class="form-control" rows="3" placeholder="Enter Description"></textarea>
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
@@ -246,7 +263,7 @@
                                                 <label>
                                                     Screens
                                                 </label>
-                                                <textarea name="address" ng-model="$ctrl.module.address" class="form-control" rows="3" placeholder="Enter Address"></textarea>
+                                                <textarea name="screen" ng-model="$ctrl.module.screen" class="form-control" rows="3" placeholder="Enter Screens"></textarea>
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                     </div>
@@ -310,43 +327,7 @@
                                                     <button type="submit" id="submit" class="btn btn-primary" ng-shortcut="'meta+s'" ng-shortcut-click>
                                                         Submit
                                                     </button>
-                                                    <a class="btn btn-primary btn-nxt" ng-shortcut="'meta+shift+down'" ng-shortcut-click>
-                                                        Next
-                                                    </a>
                                                 </div>
-                                            </div>
-                                        </div><!-- Tab Footer -->
-                                    </div><!-- Row -->
-                                </div><!-- Tab Pane Wrap -->
-                            </div><!-- Tabe Pane -->
-                            <div class="tab-pane fade" id="dependancy" data-animation="fadeInUp" data-animation-delay="300">
-                                <div class="tab-pane-wrap">
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <div class="input-text form-group">
-                                                <label>Depends On</label>
-                                                <md-select multiple ng-model="$ctrl.module.depended_module_ids" placeholder="Select Depended Modules" data-md-container-class="selectdemoSelectHeader">
-                                                    <md-select-header class="demo-select-header">
-                                                        <md-button layout-fill value="all" ng-if="$ctrl.depended_module_ids.length != $ctrl.extras.module_list.length" ng-click="selectAllFieldGroups()">SELECT ALL</md-button>
-                                                        <md-button layout-fill value="all" ng-if="$ctrl.depended_module_ids.length == $ctrl.extras.module_list.length" ng-click="deselectAllFieldGroups()">DESELECT ALL</md-button>
-                                                    </md-select-header>
-                                                    <md-optgroup label="Depended Modules">
-                                                        <md-option ng-value="item.id" ng-repeat="item in $ctrl.extras.module_list | filter:searchTravel">
-                                                            {{item.name}} / {{item.code}}
-                                                        </md-option>
-                                                    </md-optgroup>
-                                                </md-select>
-                                                <input type="hidden" name="depended_module_ids" value='{{$ctrl.module.depended_module_ids}}'>
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane-footer">
-                                            <div class="col-md-12">
-                                                <a class="btn btn-secondary btn-prev" ng-shortcut="'meta+shift+up'" ng-shortcut-click>
-                                                    Previous
-                                                </a>
-                                                <button type="submit" id="submit" class="btn btn-primary" ng-shortcut="'meta+shift+s'" ng-shortcut-click>
-                                                    Submit
-                                                </button>
                                             </div>
                                         </div><!-- Tab Footer -->
                                     </div><!-- Row -->

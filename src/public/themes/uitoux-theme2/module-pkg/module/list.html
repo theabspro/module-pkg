@@ -6,7 +6,7 @@
                     <h1 class="title type-2">Modules</h1>
                 </div><!-- Page Header Content -->
                 <div class="page-header-content button-block">
-                    <button class="btn btn-bordered" data-toggle="modal" data-target="#module-filter-modal"><i class="icon ion-md-funnel"></i>Filter</button>
+                    <button class="btn btn-bordered" data-toggle="modal" data-target="#module-filter-modal"><i class="icon ion-md-funnel filter_click"></i>Filter</button>
                 </div><!-- Page Header Content -->
             </div><!-- Page Header Content Left -->
             <div class="page-header-content-right">
@@ -54,6 +54,7 @@
                                 <th>Status</th>
                                 <th>Priority</th>
                                 <th>Assigned To</th>
+                                <th>Tester</th>
                                 <th>Duration</th>
                                 <th>Completed Percentage</th>
                                 <th>Module Group</th>
@@ -79,12 +80,34 @@
             <div class="modal-body">
                 <div class="modal-form">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Module Code</label>
-                                <input type="text" class="form-control" id="module_code" name="module_code" placeholder="Enter Module Code" autocomplete="off">
+                        <div class="col-sm-6">
+                            <div class="separate-form-group">
+                                <label>Project</label>
+                                <ui-select ng-model="$ctrl.module.project_id" theme="select2" ng-change="onselectProject($ctrl.module.project_id)">
+                                    <ui-select-match placeholder="Select Project">
+                                        {{$select.selected.name || $select.selected}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="i.id as i in $ctrl.filter.project_list | propsFilter: {name: $select.search}">
+                                        <div ng-bind-html="i.name | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <input type="hidden" name="project_id" id="project_id" value="" class="">
                             </div><!-- Field -->
-                        </div><!-- Column -->
+                        </div><!-- Column -->
+                        <div class="col-sm-6">
+                            <div class="separate-form-group">
+                                <label>Project Version</label>
+                                <ui-select ng-model="$ctrl.module.project_version_id" theme="select2" ng-change="onselectProjectVersion($ctrl.module.project_version_id);">
+                                    <ui-select-match placeholder="Select Project Version">
+                                        {{$select.selected.name || $select.selected}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="i.id as i in $ctrl.filter.project_version_list | propsFilter: {name: $select.search}">
+                                        <div ng-bind-html="i.name | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <input type="hidden" name="project_version_id" id="project_version_id" value="" class="">
+                            </div><!-- Field -->
+                        </div><!-- Column -->
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Module Name</label>
@@ -92,19 +115,82 @@
                             </div><!-- Field -->
                         </div><!-- Column -->
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Mobile Number</label>
-                                <input type="text" class="form-control" id="mobile_no" name="mobile_no" placeholder="Enter Mobile Number" autocomplete="off">
+                            <div class="separate-form-group">
+                                <label>Assigned To {{$ctrl.module.assigned_to_ids}}</label>
+                                <ui-select multiple ng-model="$ctrl.module.assigned_to_ids" on-remove="$ctrl.removed($item, $model)" theme="bootstrap" ng-disabled="$ctrl.disabled" close-on-select="false" style="" title="Choose Assigned To" ng-change="onselectAssignedTo($ctrl.module.assigned_to_ids)">
+                                    <ui-select-match placeholder="Select Assigned To">{{$item.name}}</ui-select-match>
+                                    <ui-select-choices repeat="i.id as i in $ctrl.filter.user_list | propsFilter: {name: $select.search}">
+                                        <div ng-bind-html="i.name | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <input type="hidden" name="assigned_to_id" id="assigned_to_id" value="" class="">
                             </div><!-- Field -->
+                        </div><!-- column -->
+                        <div class="col-sm-6">
+                            <div class="separate-form-group">
+                                <label>Tester</label>
+                                <ui-select ng-model="$ctrl.module.tester_id" theme="select2" ng-change="onselectTester($ctrl.module.tester_id)">
+                                    <ui-select-match placeholder="Select Tester">
+                                        {{$select.selected.name || $select.selected}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="i.id as i in $ctrl.filter.tester_list | propsFilter: {name: $select.search}">
+                                        <div ng-bind-html="i.name | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <input type="hidden" name="tester_id" id="tester_id" value="">
+                            </div><!-- Field -->
+                        </div><!-- Column -->
+                        <div class="col-md-6">
+                            <div class="separate-form-group">
+                                <label>Status</label>
+                                <ui-select multiple ng-model="$ctrl.module.status_ids" on-remove="$ctrl.removed($item, $model)" theme="bootstrap" ng-disabled="$ctrl.disabled" close-on-select="false" style="" title="Choose a Status" ng-change="onselectStatus($ctrl.module.status_ids)">
+                                    <ui-select-match placeholder="Select Status">{{$item.name}}</ui-select-match>
+                                    <ui-select-choices repeat="i.id as i in $ctrl.filter.status_list | propsFilter: {name: $select.search}">
+                                        <div ng-bind-html="i.name | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <input type="hidden" name="status_id" id="status_id" value="{{$ctrl.module.status_ids}}" class="required">
+                            </div>
+                            <!--field-->
+                        </div><!-- column -->
+                        <div class="col-md-6">
+                            <div class="separate-form-group">
+                                <label>Platform</label>
+                                <ui-select multiple ng-model="$ctrl.module.platform_ids" on-remove="$ctrl.removed($item, $model)" theme="bootstrap" ng-disabled="$ctrl.disabled" close-on-select="false" style="" title="Choose a Platform" ng-change="onselectPlatform($ctrl.module.platform_ids)">
+                                    <ui-select-match placeholder="Select Platform">{{$item.name}}</ui-select-match>
+                                    <ui-select-choices repeat="i.id as i in $ctrl.filter.platform_list | propsFilter: {name: $select.search}">
+                                        <div ng-bind-html="i.name | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <input type="hidden" name="platform_id" id="platform_id" value="{{$ctrl.module.platform_ids}}" class="required">
+                            </div>
+                        </div><!-- column -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <div class="input-group date">
+                                    <input class="form-control daterange align-left" placeholder="Select a Date Range" ng-model="$ctrl.module.start_date" name="start_date" id="start_date" value="" autocomplete="off">
+                                    <span class="input-group-addon">
+                                        <img class="img-responsive" src="./public/theme/img/content/calender-gray-icon.svg" alt="Calendar Image" />
+                                    </span>
+                                </div><!-- Input Group -->
+                            </div><!-- Feild -->
                         </div><!-- Column -->
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Email</label>
-                                <input type="text" class="form-control" id="email" name="email" placeholder="Enter Email" autocomplete="off">
-                            </div><!-- Field -->
+                                <label>End Date</label>
+                                <div class="input-group date">
+                                    <input class="form-control daterange align-left" placeholder="Select a Date Range" ng-model="$ctrl.module.end_date" name="end_date" id="end_date" value="" autocomplete="off">
+                                    <span class="input-group-addon">
+                                        <img class="img-responsive" src="./public/theme/img/content/calender-gray-icon.svg" alt="Calendar Image" />
+                                    </span>
+                                </div><!-- Input Group -->
+                            </div><!-- Feild -->
                         </div><!-- Column -->
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
-                            <button type="button" class="btn btn-rose" ng-click="reset_filter()">Reset Filter</button>
+                            <button type="button" id="reset_filter" class="btn btn-rose" ng-click="reset_filter();$ctrl.module.project_id='';$ctrl.module.project_version_id='';$ctrl.module.assigned_to_ids='';$ctrl.module.status_ids='';$ctrl.module.platform_ids='';$ctrl.module.tester_id='';">Reset Filter</button>
                         </div>
                     </div><!-- Row -->
                 </div><!-- Modal Form -->

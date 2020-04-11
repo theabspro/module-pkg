@@ -127,6 +127,14 @@ app.component('moduleList', {
         $scope.loading = true;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
+        $http.get(
+            laravel_routes['getModuleFilterData']
+        ).then(function(response) {
+            self.filter = response.data.filter;
+            console.log(self.filter);
+            $rootScope.loading = false;
+        });
+
         var table_scroll;
         table_scroll = $('.page-main-content').height() - 37;
         var dataTable = $('#modules_list').DataTable({
@@ -163,10 +171,15 @@ app.component('moduleList', {
                 type: "GET",
                 dataType: "json",
                 data: function(d) {
-                    d.module_code = $('#module_code').val();
                     d.module_name = $('#module_name').val();
-                    d.mobile_no = $('#mobile_no').val();
-                    d.email = $('#email').val();
+                    d.project_id = $('#project_id').val();
+                    d.project_version_id = $('#project_version_id').val();
+                    d.assigned_to_id = $('#assigned_to_id').val();
+                    d.tester_id = $('#tester_id').val();
+                    d.status_id = $('#status_id').val();
+                    d.platform_id = $('#platform_id').val();
+                    d.start_date = $("#start_date").val();
+                    d.end_date = $("#end_date").val();
                 },
             },
 
@@ -177,13 +190,14 @@ app.component('moduleList', {
                 { data: 'name', name: 'modules.name' },
                 { data: 'status_name', name: 'statuses.name' },
                 { data: 'priority', name: 'modules.priority' },
-                { data: 'assigned_to', name: 'at.name' },
+                { data: 'assigned_to', name: 'at.first_name' },
+                { data: 'tester_name', name: 'tester.first_name' },
                 { data: 'duration', searchable: false },
                 { data: 'completed_percentage', searchable: false },
                 { data: 'group_name', name: 'mg.name' },
+                { data: 'dependancy_count', searchable: false },
                 { data: 'start_date', searchable: false },
                 { data: 'end_date', searchable: false },
-                { data: 'dependancy_count', searchable: false },
 
             ],
             "infoCallback": function(settings, start, end, max, total, pre) {
@@ -206,6 +220,7 @@ app.component('moduleList', {
         $("#search_module").keyup(function() {
             dataTables.fnFilter(this.value);
         });
+
 
         //DELETE
         $scope.deleteModule = function($id) {
@@ -232,25 +247,88 @@ app.component('moduleList', {
         }
 
         //FOR FILTER
-        $('#module_code').on('keyup', function() {
-            dataTables.fnFilter();
-        });
         $('#module_name').on('keyup', function() {
             dataTables.fnFilter();
         });
-        $('#mobile_no').on('keyup', function() {
-            dataTables.fnFilter();
-        });
-        $('#email').on('keyup', function() {
-            dataTables.fnFilter();
-        });
-        $scope.reset_filter = function() {
-            $("#module_name").val('');
-            $("#module_code").val('');
-            $("#mobile_no").val('');
-            $("#email").val('');
+
+        $scope.onselectProject = function(id) {
+            $('#project_id').val(id);
+            $scope.projectFilterChanged(id);
             dataTables.fnFilter();
         }
+        $scope.onselectProjectVersion = function(id) {
+            $('#project_version_id').val(id);
+            dataTables.fnFilter();
+        }
+        $scope.onselectAssignedTo = function(id) {
+            $('#assigned_to_id').val(id);
+            dataTables.fnFilter();
+        }
+        $scope.onselectTester = function(id) {
+            $('#tester_id').val(id);
+            dataTables.fnFilter();
+        }
+        $scope.onselectStatus = function(id) {
+            $('#status_id').val(id);
+            dataTables.fnFilter();
+        }
+        $scope.onselectPlatform = function(id) {
+            $('#platform_id').val(id);
+            dataTables.fnFilter();
+        }
+        $scope.reset_filter = function() {
+            // alert();
+            $("#module_name").val('');
+            $("#project_id").val('');
+            $("#project_version_id").val('');
+            $("#assigned_to_id").val('');
+            $("#tester_id").val('');
+            $("#status_id").val('');
+            $("#platform_id").val('');
+            $("#start_date").val('')
+            $("#end_date").val('')
+            dataTables.fnFilter();
+        }
+        $scope.projectFilterChanged = function(id) {
+            //alert(id);
+            $http.post(
+                laravel_routes['getProjectVersions'], {
+                    'project_id': id
+                }
+            ).then(function(response) {
+                //alert();
+                self.filter.project_version_list = [];
+                console.log('empty ======' + self.filter.project_version_list);
+                self.module.project_version_id = '';
+                self.filter.project_version_list = response.data.project_versions;
+                console.log('after ======' + self.filter.project_version_list);
+            });
+
+        }
+        $('.daterange').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('DD-MM-YYYY') + ' to ' + picker.endDate.format('DD-MM-YYYY'));
+            // dataTables.fnFilter();
+        });
+        $('body').on('click', '.applyBtn', function() { //alert('sd');
+            setTimeout(function() {
+                dataTables.fnFilter();
+            }, 900);
+        });
+        $('body').on('click', '.cancelBtn', function() {
+            //alert('sd');
+            setTimeout(function() {
+                dataTables.fnFilter();
+            }, 900);
+        });
+
+        $('.align-left.daterange').daterangepicker({
+            autoUpdateInput: false,
+            "opens": "left",
+            locale: {
+                cancelLabel: 'Clear',
+                format: "DD-MM-YYYY"
+            }
+        });
 
         $rootScope.loading = false;
     }
@@ -273,9 +351,11 @@ app.component('moduleForm', {
             }
         ).then(function(response) {
             console.log(response.data);
+            //return false;
             self.module = response.data.module;
             self.extras = response.data.extras;
             self.action = response.data.action;
+
             $rootScope.loading = false;
             if (self.action == 'Edit') {
                 if (self.module.deleted_at) {
@@ -284,22 +364,57 @@ app.component('moduleForm', {
                     self.switch_value = 'Active';
                 }
             } else {
+                self.extras.module_list = [];
+                self.extras.project_version_list = [];
+
                 self.switch_value = 'Active';
                 self.state_list = [{ 'id': '', 'name': 'Select State' }];
             }
         });
 
+        self.depended_module_ids = [];
+        $scope.selectAllFieldGroups = function() {
+            self.all_depended_module_ids = [];
+            angular.forEach(self.extras.module_list, function(value, key) {
+                console.log("value====" + value.id);
+                self.all_depended_module_ids.push(value.id);
+            });
+            console.log(self.extras.module_list);
+            self.module.depended_module_ids = self.all_depended_module_ids;
+        };
+        $scope.deselectAllFieldGroups = function() {
+            self.module.depended_module_ids = [];
+        };
         $scope.projectChanged = function() {
             $http.post(
                 laravel_routes['getProjectVersions'], {
                     'project_id': self.module.project.id
                 }
             ).then(function(response) {
+                // alert();
+                self.extras.project_version_list = [];
+                //self.module.project_version = '';
+                //self.module.depended_module_ids = '';
+                //self.extras.module_list = [];
                 self.extras.project_version_list = response.data.project_versions;
             });
 
         }
 
+        $scope.versionChanged = function() {
+            console.log(self.module.project_version.id);
+            $http.post(
+                laravel_routes['getProjectVersionModules'], {
+                    'project_version_id': self.module.project_version.id,
+                    'module_id': self.module.id
+                }
+            ).then(function(response) {
+                //self.extras.module_list = [];
+                //self.module.depended_module_ids = '';
+                self.extras.module_list = response.data.module_list;
+            });
+
+        }
         /* Tab Funtion */
         $('.btn-nxt').on("click", function() {
             $('.cndn-tabs li.active').next().children('a').trigger("click");
@@ -336,24 +451,43 @@ app.component('moduleForm', {
         var v = jQuery(form_id).validate({
             ignore: '',
             rules: {
+                'project_id': {
+                    required: true,
+                },
+                'project_version_id': {
+                    required: true,
+                },
                 'name': {
                     required: true,
-                    minlength: 3,
-                    maxlength: 255,
+                    maxlength: 191,
                 },
                 'duration': {
-                    maxlength: 100,
+                    required: true,
+                    number: true,
+                },
+
+                'priority': {
+                    required: true,
+                    number: true,
+                },
+                'start_date': {
+                    required: true,
+                    //number: true,
+                },
+                'completed_percentage': {
+                    required: true,
+                    number: true,
                 },
             },
             messages: {
                 'name': {
-                    maxlength: 'Maximum of 255 charaters',
+                    maxlength: 'Maximum of 191 charaters',
                 },
                 'duration': {
                     maxlength: 'Maximum of 100 charaters',
                 },
             },
-            invalidHandler: function(event, validator) {
+            /*invalidHandler: function(event, validator) {
                 $noty = new Noty({
                     type: 'error',
                     layout: 'topRight',
@@ -362,7 +496,7 @@ app.component('moduleForm', {
                 setTimeout(function() {
                     $noty.close();
                 }, 3000)
-            },
+            },*/
             submitHandler: function(form) {
                 let formData = new FormData($(form_id)[0]);
                 $('#submit').button('loading');
@@ -375,14 +509,7 @@ app.component('moduleForm', {
                     })
                     .done(function(res) {
                         if (res.success == true) {
-                            $noty = new Noty({
-                                type: 'success',
-                                layout: 'topRight',
-                                text: res.message,
-                            }).show();
-                            setTimeout(function() {
-                                $noty.close();
-                            }, 3000);
+                            custom_noty('success', res.message);
                             $location.path('/module-pkg/module/list');
                             $scope.$apply();
                         } else {
@@ -392,14 +519,8 @@ app.component('moduleForm', {
                                 for (var i in res.errors) {
                                     errors += '<li>' + res.errors[i] + '</li>';
                                 }
-                                $noty = new Noty({
-                                    type: 'error',
-                                    layout: 'topRight',
-                                    text: errors
-                                }).show();
-                                setTimeout(function() {
-                                    $noty.close();
-                                }, 3000);
+                                custom_noty('error', errors);
+
                             } else {
                                 $('#submit').button('reset');
                                 $location.path('/module-pkg/module/list');
@@ -409,14 +530,7 @@ app.component('moduleForm', {
                     })
                     .fail(function(xhr) {
                         $('#submit').button('reset');
-                        $noty = new Noty({
-                            type: 'error',
-                            layout: 'topRight',
-                            text: 'Something went wrong at server',
-                        }).show();
-                        setTimeout(function() {
-                            $noty.close();
-                        }, 3000);
+                        custom_noty('error', 'Something went wrong at server');
                     });
             }
         });

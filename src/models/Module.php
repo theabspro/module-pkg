@@ -64,7 +64,7 @@ class Module extends Model {
 	}
 
 	public function projectVersion() {
-		return $this->belongsTo('Abs\ProjectPkg\ProjectVersion');
+		return $this->belongsTo('Abs\ProjectPkg\ProjectVersion','project_version_id');
 	}
 
 	public static function createFromObject($record_data, $company = null) {

@@ -8,11 +8,14 @@ Route::group(['namespace' => 'Abs\ModulePkg', 'middleware' => ['web', 'auth'], '
 	Route::post('/module/save', 'ModuleController@saveModule')->name('saveModule');
 	Route::post('/module/update-priority', 'ModuleController@updateModulePriority')->name('updateModulePriority');
 	Route::get('/module/delete/{id}', 'ModuleController@deleteModule')->name('deleteModule');
+	Route::post('project-version-module/get', 'ModuleController@getProjectVersionModules')->name('getProjectVersionModules');
+	Route::get('/module/get-filter-data', 'ModuleController@getModuleFilterData')->name('getModuleFilterData');
 
 	Route::get('/module-groups/get-list', 'ModuleGroupController@getModuleGroupList')->name('getModuleGroupList');
 	Route::get('/module-group/get-form-data/{id?}', 'ModuleGroupController@getModuleGroupFormData')->name('getModuleGroupFormData');
 	Route::post('/module-group/save', 'ModuleGroupController@saveModule')->name('saveModuleGroup');
 	Route::get('/module-group/delete/{id}', 'ModuleGroupController@deleteModule')->name('deleteModuleGroup');
+
 
 	Route::get('/getGanttChartFormData', 'ModuleController@getGanttChartFormData')->name('getGanttChartFormData');
 	Route::get('/getGanttChartData', 'ModuleController@getGanttChartData')->name('getGanttChartData');
