@@ -1,14 +1,14 @@
 <?php
 
 namespace Abs\ModulePkg;
+use Abs\BasicPkg\Config;
 use Abs\ModulePkg\Module;
 use Abs\ModulePkg\ModuleGroup;
 use Abs\ProjectPkg\Project;
 use Abs\ProjectPkg\ProjectVersion;
-use Abs\BasicPkg\Config;
+use Abs\StatusPkg\Status;
 use App\Address;
 use App\Http\Controllers\Controller;
-use Abs\StatusPkg\Status;
 use App\User;
 use Auth;
 use Carbon\Carbon;
@@ -88,20 +88,20 @@ class ModuleController extends Controller {
 			$end_from_date = '';
 			$end_to_date = '';
 		}
-		if(!empty($request->status_id)){
+		if (!empty($request->status_id)) {
 			$status_ids = explode(',', $request->status_id);
-		}else{
-			$status_ids='';
+		} else {
+			$status_ids = '';
 		}
-		if(!empty($request->assigned_to_id)){
+		if (!empty($request->assigned_to_id)) {
 			$assigned_to_ids = explode(',', $request->assigned_to_id);
-		}else{
-			$assigned_to_ids='';
+		} else {
+			$assigned_to_ids = '';
 		}
-		if(!empty($request->platform_id)){
+		if (!empty($request->platform_id)) {
 			$platform_ids = explode(',', $request->platform_id);
-		}else{
-			$platform_ids='';
+		} else {
+			$platform_ids = '';
 		}
 
 		//dd($status_ids);
@@ -203,7 +203,7 @@ class ModuleController extends Controller {
 			->make(true);
 	}
 
-public function getModuleFilterData() {
+	public function getModuleFilterData() {
 		$this->data['filter']['project_list'] = Collect(
 			Project::select([
 				'id',
@@ -212,11 +212,11 @@ public function getModuleFilterData() {
 				->get())->prepend(['name' => 'Select Project'])
 		;
 		$this->data['filter']['project_version_list'] = Collect(
-				ProjectVersion::select([
-					'id',
-					'number as name',
-				])
-					->get())->prepend(['name' => 'Select Project Version']);
+			ProjectVersion::select([
+				'id',
+				'number as name',
+			])
+				->get())->prepend(['name' => 'Select Project Version']);
 		$this->data['filter']['module_list'] = Collect(
 			Module::select('id', 'name', 'code')
 				->orderBy('modules.code')
@@ -229,7 +229,7 @@ public function getModuleFilterData() {
 				'name',
 			])
 				->where('type_id', 161)
-				//->company()
+			//->company()
 				->get())->prepend(['name' => 'Select Status'])
 		;
 		$this->data['filter']['platform_list'] = Collect(
@@ -237,8 +237,8 @@ public function getModuleFilterData() {
 				'id',
 				'name',
 			])
-			->where('config_type_id', 50)
-			->get())->prepend(['name' => 'Select Platform'])
+				->where('config_type_id', 50)
+				->get())->prepend(['name' => 'Select Platform'])
 		;
 		$this->data['filter']['user_list'] = Collect(
 			User::select([
@@ -246,8 +246,8 @@ public function getModuleFilterData() {
 				DB::raw('CONCAT(first_name," ",last_name) as name'),
 				'email',
 			])
-			->where('user_type_id', 1)
-			->get())->prepend(['name' => 'Select Assigned To'])
+				->where('user_type_id', 1)
+				->get())->prepend(['name' => 'Select Assigned To'])
 		;
 		$this->data['filter']['tester_list'] = Collect(
 			User::select([
@@ -255,8 +255,8 @@ public function getModuleFilterData() {
 				DB::raw('CONCAT(first_name," ",last_name) as name'),
 				'email',
 			])
-			->where('user_type_id', 1)
-			->get())->prepend(['name' => 'Select Tester'])
+				->where('user_type_id', 1)
+				->get())->prepend(['name' => 'Select Tester'])
 		;
 		$this->data['filter']['group_list'] = Collect(
 			ModuleGroup::where('company_id', Auth::user()->company_id)->select('id', 'name')->orderBy('name')
@@ -265,7 +265,6 @@ public function getModuleFilterData() {
 		$this->data['success'] = true;
 		return response()->json($this->data);
 	}
-
 
 	public function getModuleFormData(Request $r) {
 		$id = $r->id;
@@ -281,7 +280,6 @@ public function getModuleFilterData() {
 				'projectVersion',
 				'ProjectVersion.project',
 			])->withTrashed()->find($id);
-			//dd($module->projectVersion);
 			$module->start_date = $module->start_date;
 			$module->end_date = $module->end_date;
 			$module->project = $module->projectVersion->project;
@@ -315,7 +313,7 @@ public function getModuleFilterData() {
 				'name',
 			])
 				->where('type_id', 161)
-				//->company()
+			//->company()
 				->get())->prepend(['name' => 'Select Status'])
 		;
 		$this->data['extras']['platform_list'] = Collect(
@@ -323,8 +321,8 @@ public function getModuleFilterData() {
 				'id',
 				'name',
 			])
-			->where('config_type_id', 50)
-			->get())->prepend(['name' => 'Select Platform'])
+				->where('config_type_id', 50)
+				->get())->prepend(['name' => 'Select Platform'])
 		;
 		$this->data['extras']['user_list'] = Collect(
 			User::select([
@@ -332,8 +330,8 @@ public function getModuleFilterData() {
 				DB::raw('CONCAT(first_name," ",last_name) as name'),
 				'email',
 			])
-			->where('user_type_id', 1)
-			->get())->prepend(['name' => 'Select Assigned To'])
+				->where('user_type_id', 1)
+				->get())->prepend(['name' => 'Select Assigned To'])
 		;
 		$this->data['extras']['group_list'] = Collect(
 			ModuleGroup::where('company_id', Auth::user()->company_id)->select('id', 'name')->orderBy('name')
@@ -349,7 +347,7 @@ public function getModuleFilterData() {
 	}
 
 	public function saveModule(Request $request) {
-	 //dd($request->all());
+		//dd($request->all());
 		try {
 			$error_messages = [
 				'name.required' => 'Module Name is Required',
@@ -391,6 +389,10 @@ public function getModuleFilterData() {
 					'nullable',
 					'exists:users,id',
 				],
+				'priority' => [
+					'nullable',
+					'numeric',
+				],
 				'tester_id' => [
 					'nullable',
 					'exists:users,id',
@@ -412,6 +414,7 @@ public function getModuleFilterData() {
 				$module->updated_at = Carbon::now();
 			}
 			$module->fill($request->all());
+			$module->priority = $request->priority ? $request->priority : 999;
 			if ($request->status == 'Inactive') {
 				$module->deleted_at = Carbon::now();
 				$module->deleted_by_id = Auth::user()->id;
@@ -442,18 +445,18 @@ public function getModuleFilterData() {
 	public function getProjectVersionModules(Request $r) {
 		//dd($r->all());
 		$this->data['success'] = true;
-		if(isset($r->module_id)){
+		if (isset($r->module_id)) {
 			$this->data['module_list'] = collect(Module::
-				where('project_version_id', $r->project_version_id)
-				->where('id','!=',$r->module_id)
-				->select('id',DB::raw('CONCAT(code,"/",name) as name'))
-				->get())
+					where('project_version_id', $r->project_version_id)
+					->where('id', '!=', $r->module_id)
+					->select('id', DB::raw('CONCAT(code,"/",name) as name'))
+					->get())
 				->prepend(['id' => '', 'name' => 'Select Version Module']);
-		}else{
+		} else {
 			$this->data['module_list'] = collect(Module::
-				where('project_version_id', $r->project_version_id)
-				->select('id',DB::raw('CONCAT(code,"/",name) as name'))
-				->get())
+					where('project_version_id', $r->project_version_id)
+					->select('id', DB::raw('CONCAT(code,"/",name) as name'))
+					->get())
 				->prepend(['id' => '', 'name' => 'Select Version Module']);
 		}
 		return response()->json($this->data);

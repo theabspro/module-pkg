@@ -67,8 +67,12 @@ class Module extends Model {
 		return $this->belongsTo('App\Status');
 	}
 
+	public function platform() {
+		return $this->belongsTo('App\Config', 'platform_id');
+	}
+
 	public function projectVersion() {
-		return $this->belongsTo('Abs\ProjectPkg\ProjectVersion','project_version_id');
+		return $this->belongsTo('Abs\ProjectPkg\ProjectVersion', 'project_version_id');
 	}
 
 	public static function createFromObject($record_data, $company = null) {
