@@ -116,7 +116,7 @@
                         </div><!-- Column -->
                         <div class="col-md-6">
                             <div class="separate-form-group">
-                                <label>Assigned To {{$ctrl.module.assigned_to_ids}}</label>
+                                <label>Assigned To</label>
                                 <ui-select multiple ng-model="$ctrl.module.assigned_to_ids" on-remove="$ctrl.removed($item, $model)" theme="bootstrap" ng-disabled="$ctrl.disabled" close-on-select="false" style="" title="Choose Assigned To" ng-change="onselectAssignedTo($ctrl.module.assigned_to_ids)">
                                     <ui-select-match placeholder="Select Assigned To">{{$item.name}}</ui-select-match>
                                     <ui-select-choices repeat="i.id as i in $ctrl.filter.user_list | propsFilter: {name: $select.search}">
