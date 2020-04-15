@@ -1,13 +1,13 @@
 <?php
 
 namespace Abs\ModulePkg;
+use Abs\BasicPkg\Address;
 use Abs\BasicPkg\Config;
 use Abs\ModulePkg\Module;
 use Abs\ModulePkg\ModuleGroup;
 use Abs\ProjectPkg\Project;
 use Abs\ProjectPkg\ProjectVersion;
 use Abs\StatusPkg\Status;
-use App\Address;
 use App\Http\Controllers\Controller;
 use App\User;
 use Auth;
@@ -462,11 +462,19 @@ class ModuleController extends Controller {
 		return response()->json($this->data);
 	}
 
-	public function deleteModule($id) {
-		$delete_status = Module::withTrashed()->where('id', $id)->forceDelete();
-		if ($delete_status) {
-			$address_delete = Address::where('address_of_id', 24)->where('entity_id', $id)->forceDelete();
-			return response()->json(['success' => true]);
+	public function deleteModule(Request $r) {
+		// dd($r->id);
+		DB::beginTransaction();
+		try {
+			$delete_module = Module::withTrashed()->where('id', $r->id)->forceDelete();
+			DB::commit();
+			if ($delete_module) {
+				$address_delete = Address::where('address_of_id', 24)->where('entity_id', $r->id)->forceDelete();
+				return response()->json(['success' => true]);
+			}
+		} catch (Exception $e) {
+			DB::rollBack();
+			return response()->json(['success' => false, 'errors' => ['Exception Error' => $e->getMessage()]]);
 		}
 	}
 

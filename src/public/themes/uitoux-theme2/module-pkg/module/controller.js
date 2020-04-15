@@ -22,9 +22,13 @@ app.component('statusWiseModules', {
             $('#module_id').val($id);
         }
         $scope.deleteConfirm = function() {
-            $id = $('#module_id').val();
+            id = $('#module_id').val();
             $http.get(
-                module_delete_data_url + '/' + $id,
+                laravel_routes['deleteModule'], {
+                    params: {
+                        id: id,
+                    }
+                }
             ).then(function(response) {
                 if (response.data.success) {
                     $noty = new Noty({
@@ -83,9 +87,13 @@ app.component('userWiseModules', {
             $('#module_id').val($id);
         }
         $scope.deleteConfirm = function() {
-            $id = $('#module_id').val();
+            id = $('#module_id').val();
             $http.get(
-                module_delete_data_url + '/' + $id,
+                laravel_routes['deleteModule'], {
+                    params: {
+                        id: id,
+                    }
+                }
             ).then(function(response) {
                 if (response.data.success) {
                     $noty = new Noty({
@@ -228,9 +236,13 @@ app.component('moduleList', {
             $('#module_id').val($id);
         }
         $scope.deleteConfirm = function() {
-            $id = $('#module_id').val();
+            id = $('#module_id').val();
             $http.get(
-                module_delete_data_url + '/' + $id,
+                laravel_routes['deleteModule'], {
+                    params: {
+                        id: id,
+                    }
+                }
             ).then(function(response) {
                 if (response.data.success) {
                     $noty = new Noty({
