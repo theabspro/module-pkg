@@ -466,7 +466,7 @@ class ModuleController extends Controller {
 		// dd($r->id);
 		DB::beginTransaction();
 		try {
-			$delete_module = Module::withTrashed()->where('id', $r->id)->forceDelete();
+			$delete_module = Module::where('id', $r->id)->delete();
 			DB::commit();
 			if ($delete_module) {
 				$address_delete = Address::where('address_of_id', 24)->where('entity_id', $r->id)->forceDelete();
