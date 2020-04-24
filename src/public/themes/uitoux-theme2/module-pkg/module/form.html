@@ -230,7 +230,7 @@
                                                 </label>
                                                 <md-select ng-model="$ctrl.module.platform_id" placeholder="Select Platform" data-md-container-class="selectdemoSelectHeader">
                                                     <md-select-header class="demo-select-header ng-hide">
-                                                        <input ng-model="searchPlatform" type="search" placeholder="Search Assignee" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                        <input ng-model="searchPlatform" type="search" placeholder="Search Platform" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
                                                     </md-select-header>
                                                     <md-optgroup label="Platform To">
                                                         <md-option ng-value="item.id" ng-repeat="item in $ctrl.extras.platform_list | filter:searchTravel">

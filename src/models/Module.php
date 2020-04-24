@@ -67,8 +67,13 @@ class Module extends Model {
 		return $this->belongsTo('App\Status');
 	}
 
-	public function platform() {
-		return $this->belongsTo('App\Config', 'platform_id');
+	// public function platform() {
+	// 	return $this->belongsTo('App\Config', 'platform_id');
+	// }
+
+	public function platform()
+	{
+		return $this->belongsTo('Abs\ModulePkg\Platform','platform_id');
 	}
 
 	public function projectVersion() {

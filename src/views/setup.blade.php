@@ -49,6 +49,20 @@
 	    when('/module-pkg/module-group/edit/:id', {
 	        template: '<module-group-form></module-group-form>',
 	        title: 'Edit Module Group',
+	    }).
+
+	    //PLATFORM
+	    when('/module-pkg/platform/list', {
+	        template: '<platform-list></platform-list>',
+	        title: 'Platforms',
+	    }).
+	    when('/module-pkg/platform/add', {
+	        template: '<platform-form></platform-form>',
+	        title: 'Add Platform',
+	    }).
+	    when('/module-pkg/platform/edit/:id', {
+	        template: '<platform-form></platform-form>',
+	        title: 'Edit Platform',
 	    })
 
 	    ;
@@ -64,8 +78,12 @@
     //MODULE GROUPS
     var module_group_list_template_url = "{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module-group/list.html')}}";
     var module_group_form_template_url = "{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module-group/form.html')}}";
+
+    //PLATFORM
+    var platform_list_template_url = "{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/platform/list.html')}}";
+    var platform_form_template_url = "{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/platform/form.html')}}";
+    
 </script>
 <script type="text/javascript" src="{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module/controller.js?v=2')}}"></script>
 <script type="text/javascript" src="{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module-group/controller.js?v=2')}}"></script>
-
-
+<script type="text/javascript" src="{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/platform/controller.js?v=2')}}"></script>

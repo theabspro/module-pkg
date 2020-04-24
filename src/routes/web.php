@@ -21,4 +21,9 @@ Route::group(['namespace' => 'Abs\ModulePkg', 'middleware' => ['web', 'auth'], '
 	Route::get('/getGanttChartFormData', 'ModuleController@getGanttChartFormData')->name('getGanttChartFormData');
 	Route::get('/getGanttChartData', 'ModuleController@getGanttChartData')->name('getGanttChartData');
 
+	Route::get('/platform/get-list', 'PlatformController@getPlatformList')->name('getPlatformList');
+	Route::get('/platform/get-form-data', 'PlatformController@getPlatformFormData')->name('getPlatformFormData');
+	Route::post('/platform/save', 'PlatformController@savePlatform')->name('savePlatform');
+	Route::get('/platform/delete/', 'PlatformController@deletePlatform')->name('deletePlatform');
+
 });

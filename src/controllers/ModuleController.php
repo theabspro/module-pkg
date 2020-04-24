@@ -5,6 +5,7 @@ use Abs\BasicPkg\Address;
 use Abs\BasicPkg\Config;
 use Abs\ModulePkg\Module;
 use Abs\ModulePkg\ModuleGroup;
+use Abs\ModulePkg\Platform;
 use Abs\ProjectPkg\Project;
 use Abs\ProjectPkg\ProjectVersion;
 use Abs\StatusPkg\Status;
@@ -316,12 +317,20 @@ class ModuleController extends Controller {
 			//->company()
 				->get())->prepend(['name' => 'Select Status'])
 		;
+		// $this->data['extras']['platform_list'] = Collect(
+		// 	Config::select([
+		// 		'id',
+		// 		'name',
+		// 	])
+		// 		->where('config_type_id', 50)
+		// 		->get())->prepend(['name' => 'Select Platform'])
+		// ;
 		$this->data['extras']['platform_list'] = Collect(
-			Config::select([
+			Platform::select([
 				'id',
 				'name',
 			])
-				->where('config_type_id', 50)
+				->where('company_id', 1)
 				->get())->prepend(['name' => 'Select Platform'])
 		;
 		$this->data['extras']['user_list'] = Collect(
@@ -353,7 +362,7 @@ class ModuleController extends Controller {
 				'name.required' => 'Module Name is Required',
 				'name.max' => 'Maximum 255 Characters',
 				'name.min' => 'Minimum 3 Characters',
-				'project_version_id.required' => 'project version is Required',
+				// 'project_version_id.required' => 'project version is Required',
 				'completed_percentage.required' => 'Completed Percentage is Required',
 			];
 			$validator = Validator::make($request->all(), [
@@ -370,16 +379,20 @@ class ModuleController extends Controller {
 					'unique:modules,name,' . $request->id . ',id,project_version_id,' . $request->project_version_id,
 				],*/
 				'project_version_id' => [
-					'required:true',
+					// 'required:true',
 					'exists:project_versions,id',
 				],
 				'group_id' => [
 					'nullable',
 					'exists:module_groups,id',
 				],
+				// 'platform_id' => [
+				// 	'nullable',
+				// 	'exists:configs,id',
+				// ],
 				'platform_id' => [
 					'nullable',
-					'exists:configs,id',
+					'exists:platforms,id',
 				],
 				'status_id' => [
 					'nullable',
