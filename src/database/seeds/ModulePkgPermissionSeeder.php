@@ -76,6 +76,31 @@ class ModulePkgPermissionSeeder extends Seeder {
 				'display_name' => 'View Only Own',
 			],
 
+			//PLATFORM
+			[
+				'display_order' => 99,
+				'parent' => null,
+				'name' => 'platforms',
+				'display_name' => 'Platforms',
+			],
+			[
+				'display_order' => 1,
+				'parent' => 'platforms',
+				'name' => 'add-platform',
+				'display_name' => 'Add',
+			],
+			[
+				'display_order' => 1,
+				'parent' => 'platforms',
+				'name' => 'edit-platform',
+				'display_name' => 'Edit',
+			],
+			[
+				'display_order' => 2,
+				'parent' => 'platforms',
+				'name' => 'delete-platform',
+				'display_name' => 'Delete',
+			],
 		];
 		Permission::createFromArrays($permissions);
 	}
