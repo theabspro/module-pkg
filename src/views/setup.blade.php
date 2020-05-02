@@ -31,6 +31,10 @@
 	        template: '<module-form></module-form>',
 	        title: 'Edit Module',
 	    }).
+	    when('/module-pkg/module/view/:id', {
+	        template: '<module-view></module-view>',
+	        title: 'View Module',
+	    }).
 
 	    when('/project-pkg/project-version/gantt-chart-view', {
 	        template: '<project-version-gantt-chart-view></project-version-view-gantt-chart-view>',
@@ -82,7 +86,7 @@
     //PLATFORM
     var platform_list_template_url = "{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/platform/list.html')}}";
     var platform_form_template_url = "{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/platform/form.html')}}";
-    
+
 </script>
 <script type="text/javascript" src="{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module/controller.js?v=2')}}"></script>
 <script type="text/javascript" src="{{URL::asset($module_pkg_prefix.'/public/themes/'.$theme.'/module-pkg/module-group/controller.js?v=2')}}"></script>

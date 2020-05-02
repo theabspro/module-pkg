@@ -2,14 +2,14 @@
 
 namespace Abs\ModulePkg;
 use Abs\BasicPkg\Address;
-use Abs\BasicPkg\Config;
-use Abs\ModulePkg\Module;
 use Abs\ModulePkg\ModuleGroup;
-use Abs\ModulePkg\Platform;
-use Abs\ProjectPkg\Project;
-use Abs\ProjectPkg\ProjectVersion;
-use Abs\StatusPkg\Status;
+use App\Config;
 use App\Http\Controllers\Controller;
+use App\Module;
+use App\Platform;
+use App\Project;
+use App\ProjectVersion;
+use App\Status;
 use App\User;
 use Auth;
 use Carbon\Carbon;
